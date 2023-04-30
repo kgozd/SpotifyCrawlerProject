@@ -1,6 +1,5 @@
 from spotipy.oauth2 import SpotifyClientCredentials
 from spotipy import Spotify
-from config import client_id, client_secret
 from json import dumps
 
 class SpotifyAuthenticator:
@@ -21,10 +20,8 @@ class SpotifyAnalyzer:
         result = self.sp.search(artist_name, limit=1, type='artist')
         if result['artists']['items']:
             artist = result['artists']['items'][0]
-      
-            id_artysty = artist['id']
+            return  artist['id']
             
-            return  id_artysty
         
     def get_artist_info(self, id_artysty):
         artist = self.sp.artist(id_artysty)
@@ -67,46 +64,86 @@ class SpotifyAnalyzer:
         while results['next']:
             results = self.sp.next(results)
             albums.extend(results['items'])
-        return [{
-            'name': album['name'],
-            'release_date': album['release_date'],
-            'total_tracks': album['total_tracks'],
-            'uri': album['uri']
-
-        } for album in albums ]
-
-    def get_track_info(self, track_name):
-        result = self.sp.search(track_name, limit=10, type='track')
-        if result['tracks']['items']:
-            track = result['tracks']['items'][0]
-            track_id = track['id']
-            audio_features = self.sp.audio_features(track_id)[0]
-            dict =  {
-                'album_name': track['album']['name'], # nazwa albumu, na którym jest utwór
-                'album_release_date': track['album']['release_date'], # data wydania albumu
-                'artist_name': track['artists'][0]['name'], # nazwa pierwszego wykonawcy utworu
-                'artist_genres': self.sp.artist(track['artists'][0]['id'])['genres'], # gatunki muzyczne wykonawcy
-                'name': track['name'], 
-                'duration': track['duration_ms']/60000,\
-                'popularity': track['popularity'],
-                'danceability': audio_features['danceability'], # wskaźnik taneczności utworu
-                'energy': audio_features['energy'], # wskaźnik energiczności utworu
-                'key': audio_features['key'], # tonacja utworu
-                'loudness': audio_features['loudness'], # głośność utworu w decybelach
-                'mode': audio_features['mode'], # tryb tonacji utworu (0 - minor, 1 - major)
-                'speechiness': audio_features['speechiness'], # wskaźnik ilości mowy w utworze
-                'acousticness': audio_features['acousticness'], # wskaźnik akustyczności utworu
-                'instrumentalness': audio_features['instrumentalness'], # wskaźnik instrumentalności utworu
-                'liveness': audio_features['liveness'], # wskaźnik nastrajania publiczności podczas nagrania
-                'valence': audio_features['valence'], # wskaźnik pozytywnego nastawienia w utworze
-                'tempo': audio_features['tempo'], # tempo utworu w uderzeniach na minutę
-                'preview_url': track['preview_url'], # adres URL do fragmentu utworu do odsłuchania
-                'external_urls': track['external_urls'], # zewnętrzne adresy URL związane z utworem
-                #'available_markets': track['available_markets'] # kraje, w których utwór jest dostępny
-            }
+        return albums
     
-          
-            print(dumps(dict, indent=4))
-        return None
+    def display_albums(self, albums):
+        album_names = []
+        for i, album in enumerate(albums):
+            if album['name'] not in album_names:
+                album_names.append(album['name'])
+                print(f"{len(album_names)}. {album['name']} ({album['release_date']})")
+            
+    
+    def get_tracks_from_album(self, album_uri):
+        tracks = []
+        results = self.sp.album_tracks(album_uri)
+        tracks.extend(results['items'])
+        while results['next']:
+            results = self.sp.next(results)
+            tracks.extend(results['items'])
+        return tracks
+    
+    def display_tracks(self, tracks):
+        for i, track in enumerate(tracks):
+            time_in_minutes = track['duration_ms']/60000
+            print(f"{i + 1}. {track['name']} ({time_in_minutes} min)")
+    
+    def get_track_info(self, track_uri):
 
-authenticator = SpotifyAuthenticator(client_id, client_secret)
+        track = self.sp.track(track_uri)
+        audio_features = self.sp.audio_features(track_uri)[0]
+
+
+        dict = ({
+            'album_name': track['album']['name'], # nazwa albumu, na którym jest utwór
+            'album_release_date': track['album']['release_date'], # data wydania albumu
+            'artist_name': track['artists'][0]['name'], # nazwa pierwszego wykonawcy utworu
+            'artist_genres': self.sp.artist(track['artists'][0]['id'])['genres'], # gatunki muzyczne wykonawcy
+            'name': track['name'], 
+            'duration': track['duration_ms']/60000,\
+            'popularity': track['popularity'],
+            'danceability': audio_features['danceability'], # wskaźnik taneczności utworu
+            'energy': audio_features['energy'], # wskaźnik energiczności utworu
+            'key': audio_features['key'], # tonacja utworu
+            'loudness': audio_features['loudness'], # głośność utworu w decybelach
+            'mode': audio_features['mode'], # tryb tonacji utworu (0 - minor, 1 - major)
+            'speechiness': audio_features['speechiness'], # wskaźnik ilości mowy w utworze
+            'acousticness': audio_features['acousticness'], # wskaźnik akustyczności utworu
+            'instrumentalness': audio_features['instrumentalness'], # wskaźnik instrumentalności utworu
+            'liveness': audio_features['liveness'], # wskaźnik nastrajania publiczności podczas nagrania
+            'valence': audio_features['valence'], # wskaźnik pozytywnego nastawienia w utworze
+            'tempo': audio_features['tempo'], # tempo utworu w uderzeniach na minutę
+            'preview_url': track['preview_url'], # adres URL do fragmentu utworu do odsłuchania
+            'external_urls': track['external_urls'], # zewnętrzne adresy URL związane z utworem
+            #'available_markets': track['available_markets'] # kraje, w których utwór jest dostępny
+            
+        })
+        print(dumps(dict, indent=4)) 
+    """        
+    def get_all_albums(self, artist_id):
+        albums = []
+        results = self.sp.artist_albums(artist_id, album_type='album')
+        albums.extend(results['items'])
+        while results['next']:
+            results = self.sp.next(results)
+            albums.extend(results['items'])
+        
+        # Print list of albums and allow user to choose which album to view details
+        print("Albums:")
+        for i, album in enumerate(albums):
+            print(f"{i+1}. {album['name']} ({album['release_date']})")
+        album_choice = input("Choose an album (enter the number): ")
+        
+        # Get details of chosen album
+        chosen_album = albums[int(album_choice)-1]
+        album_dict = {
+            'name': chosen_album['name'],
+            'release_date': chosen_album['release_date'],
+            'total_tracks': chosen_album['total_tracks'],
+            'uri': chosen_album['uri']
+        }
+        print(dumps(album_dict, indent=4))
+        """
+          
+        
+
