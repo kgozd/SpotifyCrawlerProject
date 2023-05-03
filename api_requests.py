@@ -71,7 +71,7 @@ class SpotifyAnalyzer:
         for i, album in enumerate(albums):
             if album['name'] not in album_names:
                 album_names.append(album['name'])
-                print(f"{len(album_names)}. {album['name']} ({album['release_date']})")
+                return f"{len(album_names)}. {album['name']} ({album['release_date']})"
             
     
     def get_tracks_from_album(self, album_uri):
@@ -85,7 +85,7 @@ class SpotifyAnalyzer:
     
     def display_tracks(self, tracks):
         for i, track in enumerate(tracks):
-            time_in_minutes = track['duration_ms']/60000
+            time_in_minutes = round(track['duration_ms']/60000,2)
             print(f"{i + 1}. {track['name']} ({time_in_minutes} min)")
     
     def get_track_info(self, track_uri):
@@ -100,7 +100,7 @@ class SpotifyAnalyzer:
             'artist_name': track['artists'][0]['name'], # nazwa pierwszego wykonawcy utworu
             'artist_genres': self.sp.artist(track['artists'][0]['id'])['genres'], # gatunki muzyczne wykonawcy
             'name': track['name'], 
-            'duration': track['duration_ms']/60000,\
+            'duration minutes': round(track['duration_ms']/60000,2),
             'popularity': track['popularity'],
             'danceability': audio_features['danceability'], # wskaźnik taneczności utworu
             'energy': audio_features['energy'], # wskaźnik energiczności utworu
@@ -118,7 +118,6 @@ class SpotifyAnalyzer:
             #'available_markets': track['available_markets'] # kraje, w których utwór jest dostępny
             
         })
-        print(dumps(dict, indent=4)) 
     """        
     def get_all_albums(self, artist_id):
         albums = []
