@@ -7,7 +7,7 @@ class Application:
         
         root = Tk()
         root.title('Page Switcher')
-        root.iconbitmap(".\\Pictures\\temp_icon.ico")
+        #root.iconbitmap(".\\Pictures\\temp_icon.ico")
         root.geometry('700x600')
         main_view = MainView(root)
         

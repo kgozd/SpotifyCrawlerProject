@@ -1,7 +1,7 @@
 from spotipy.oauth2 import SpotifyClientCredentials
 from spotipy import Spotify
 from json import dumps
-
+from config import client_id, client_secret
 class SpotifyAuthenticator:
     def __init__(self, client_id, client_secret):
         self.client_credentials_manager = SpotifyClientCredentials(client_id, client_secret)
