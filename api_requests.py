@@ -14,7 +14,7 @@ class SpotifyAuthenticator:
 class SpotifyAnalyzer:
     def __init__(self, spotify_instance):
         self.sp = spotify_instance
-
+ 
 
     def get_artist_id(self, artist_name):
         result = self.sp.search(artist_name, limit=1, type='artist')
@@ -118,6 +118,7 @@ class SpotifyAnalyzer:
             #'available_markets': track['available_markets'] # kraje, w których utwór jest dostępny
             
         })
+        print(dumps(dict, indent=4))
     """        
     def get_all_albums(self, artist_id):
         albums = []
