@@ -59,12 +59,12 @@ class Page1(Page):
         self.tabview.add("Lista Utworów")
         self.tabview.tab("Lista Utworów").grid_columnconfigure(0, weight=1)  # configure grid of individual tabs
         """
-        
+
 
         self.logo_label = CTkLabel(self, text="Utwory", font=CTkFont(size=20, weight="bold"), text_color="#2b2b2b")
         self.logo_label.grid(row=0, column=2, padx=20, pady=(20, 10))
 
-        self.textbox = CTkTextbox(self, width=200 ,text_color="white",corner_radius = 10, font=("Arial", 12))
+        self.textbox = CTkTextbox(self, width=200 ,text_color="white",corner_radius = 10, font=("Arial", 15))
         self.textbox.grid(row=1, column=2,rowspan = 2, padx=(20, 0), pady=(10, 0), sticky="nsew")
         # Set row and column weights
        
