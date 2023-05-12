@@ -1,6 +1,6 @@
-from window import Tk, MainView
 from os import getcwd
 from time import sleep
+from window import Tk, MainView
 #from json import dumps
 class Application:
     def main(self):
@@ -8,9 +8,8 @@ class Application:
         root = Tk()
         root.title('Page Switcher')
         #root.iconbitmap(".\\Pictures\\temp_icon.ico")
-        root.geometry('700x600')
+        root.geometry('800x600')
         main_view = MainView(root)
-        
         main_view.pack(fill='both', expand=True)
 
         
@@ -23,7 +22,7 @@ class Application:
 
         #artist_name  = "Coldplay" #input("Podaj nazwę artysty: ")
         
-    
+      
 
         
         

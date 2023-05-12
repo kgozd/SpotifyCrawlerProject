@@ -1,8 +1,7 @@
-from tkinter import Frame, Label, Button, Tk, Entry, Listbox, Canvas, END, BooleanVar, Scrollbar, ttk, VERTICAL
+from tkinter import Frame, Label, Button, Tk, Entry, Listbox, Canvas, END, BooleanVar, Scrollbar, ttk, VERTICAL, LEFT
 from api_requests import  SpotifyAuthenticator, SpotifyAnalyzer
 from config import client_id, client_secret
 from customtkinter import CTkScrollbar, CTkTabview, CTkButton, CTkEntry, set_appearance_mode,set_default_color_theme, CTkScrollableFrame, CTkTextbox, CTkLabel, CTkFont
-
 
 
 class Page(Frame):
@@ -23,7 +22,7 @@ class Page1(Page):
         set_appearance_mode("System")
         set_default_color_theme("green")
         
-        self.entry = CTkEntry(self,font=("Arial", 15),  placeholder_text="Wpisz Nazwę Albumu")
+        self.entry = CTkEntry(self,font=("Arial", 15),  placeholder_text="Wpisz Nazwę Artysty")
         self.entry.grid(row=0, column=0,  padx=(20, 0), pady=(20, 10), sticky="nsew")
         self.entry.grid_columnconfigure(0, weight=1)  # configure grid of individual tabs
 
@@ -40,16 +39,16 @@ class Page1(Page):
         
 
 
-        self.albums_listbox = Listbox(self, font=("Arial", 12), width=25, height=15, bg="#2b2b2b", fg="white", cursor="hand2",selectbackground="#106a43",highlightcolor="#106a43", activestyle='none')
+        self.albums_listbox = Listbox(self, font=("Arial", 12), width=30, height=10, bg="#2b2b2b", fg="white", cursor="hand2",selectbackground="#106a43",highlightcolor="#106a43", activestyle='none', justify=LEFT)
         self.albums_listbox.grid(row=2, column=0, padx=(20, 0), pady=(10, 0), sticky="nsew")
         self.albums_listbox.grid_columnconfigure(0, weight=1) 
         
        
 
       
-        scrollbar = Scrollbar(self, orient=VERTICAL, command=self.albums_listbox.yview,troughcolor="#2b2b2b",width=12 )
-        scrollbar.grid(row=2, column=1,pady=(2, 2), sticky="ns")
-        self.albums_listbox.configure(yscrollcommand=scrollbar.set)
+        scrollbar_albums = Scrollbar(self, orient=VERTICAL, command=self.albums_listbox.yview,troughcolor="#2b2b2b",width=20 )
+        scrollbar_albums.grid(row=2, column=1,pady=(2, 2), sticky="ns")
+        self.albums_listbox.configure(yscrollcommand=scrollbar_albums.set)
 
         # Configure the grid rows and columns to expand as needed
     
@@ -64,10 +63,14 @@ class Page1(Page):
         self.logo_label = CTkLabel(self, text="Utwory", font=CTkFont(size=20, weight="bold"), text_color="#2b2b2b")
         self.logo_label.grid(row=0, column=2, padx=20, pady=(20, 10))
 
-        self.textbox = CTkTextbox(self, width=200 ,text_color="white",corner_radius = 10, font=("Arial", 15))
-        self.textbox.grid(row=1, column=2,rowspan = 2, padx=(20, 0), pady=(10, 0), sticky="nsew")
+        scrollbar_tracks = Scrollbar(self, orient=VERTICAL, command=self.tarcks_listbox.yview,troughcolor="#2b2b2b",width=20 )
+        scrollbar_tracks.grid(row=1, column=2,pady=(2, 2),rowspan = 2, sticky="ns")
+        self.tracks_listbox.configure(yscrollcommand=scrollbar_tracks.set)
+
+        #self.textbox = CTkTextbox(self, width=300 ,text_color="white",corner_radius = 10, font=("Arial", 15))
+        #self.textbox.grid(row=1, column=2,rowspan = 2, padx=(20, 0), pady=(10, 0), sticky="nsew")
         # Set row and column weights
-       
+        
 
 
 
@@ -117,7 +120,7 @@ class Page1(Page):
         selected_album = [album for album in albums if album['name'] == selected_album_name][0]
         tracks = self.sp_analyzer.get_tracks_from_album(selected_album['uri'])
         #self.print_track_info(track_info)
-        self.sp_analyzer.display_tracks(tracks ) 
+        self.sp_analyzer.display_tracks(tracks) 
         self.print_all_tracks(tracks) 
         return tracks
         
@@ -126,25 +129,21 @@ class Page1(Page):
     def print_all_tracks(self, tracks):
         self.textbox.delete('1.0', END)
 
-        for track in tracks:
-            
-            self.textbox.insert(END, track["name"] + "\n") # wstaw tekst do panelu pierwszej zakładki
+       # for track in tracks:
+        #    self.textbox.insert(END, track["name"]+ "\n") # wstaw tekst do panelu pierwszej zakładki
 
            
+        for i, track in enumerate(tracks):
+            time_in_minutes = round(track['duration_ms']/60000,2)
+            #print(f"{i + 1}. {track['name']} ({time_in_minutes} min)")
+            self.textbox.insert(END, f"{i + 1}. {track['name']} ({time_in_minutes} min)"+ "\n") # wstaw tekst do panelu pierwszej zakładki
 
-    
     """
         def print_all_tracks(self, tracks):
         utwory = self.sp_analyzer.display_tracks( tracks)
         print(utwory)
   
 
-
-
-
-
-
-    
     def print_all_tracks(self, track_info):
         self.albums_listbox.delete(0, END)
         for track in track_info:
