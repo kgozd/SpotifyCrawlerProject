@@ -10,6 +10,10 @@ class Page(Frame):
         self.name = name
         self.sp_authenticator = SpotifyAuthenticator(client_id, client_secret) # Replace client_id and client_secret with your own Spotify API credentials
         self.sp_analyzer = SpotifyAnalyzer(self.sp_authenticator.get_spotify_instance())
+        set_appearance_mode("System")
+        set_default_color_theme("green")
+
+
 
 class Page1(Page):
     def __init__(self, parent):
@@ -19,35 +23,39 @@ class Page1(Page):
         
        
     def create_widgets(self):
-        set_appearance_mode("System")
-        set_default_color_theme("green")
-        
+       
         self.entry = CTkEntry(self,font=("Arial", 15),  placeholder_text="Wpisz Nazwę Artysty")
-        self.entry.grid(row=0, column=0,  padx=(20, 0), pady=(20, 10), sticky="nsew")
+        self.entry.grid(row=0, column=1,  padx=(20, 0), pady=(20, 10), sticky="nsew")
         self.entry.grid_columnconfigure(0, weight=1)  # configure grid of individual tabs
 
         #self.entry = Entry(self, font=("Arial", 12))
         #self.entry.grid(row=2, column=2, columnspan=2, padx=(20, 0), pady=(20, 20), sticky="nsew")
 
-        self.button_1 = CTkButton(self, text="Pobierz listę albumów ",font=("Arial", 15),  command=self.print_entry_text)
-        self.button_1.grid(row=1, column=0, padx=(20, 0), pady=(10, 10), sticky="nsew")
+        self.button_1 = CTkButton(self, text="Pobierz listę albumów ",font=("Arial", 15),  command=self.enter_artist_name)
+        self.button_1.grid(row=0, column=2, padx=(20, 0), pady=(10, 10), sticky="nsew")
         self.button_1.grid_columnconfigure(0, weight=1) 
-        #button = Button(self, text="Pobierz listę albumów ", font=("Arial", 12), command=self.print_entry_text)
+        #button = Button(self, text="Pobierz lis
+        # tę albumów ", font=("Arial", 12), command=self.print_entry_text)
         #button.grid(row=3, column=2, columnspan=2, padx=(20, 0), pady=(20, 20), sticky="nsew")
         
 
         
+        self.listbox_label = CTkLabel(self, text="Albumy", font=CTkFont(size=20, weight="bold"), text_color="#2b2b2b")
+        self.listbox_label.grid(row=1, column=1, padx=20, pady=(20, 10))
 
 
-        self.albums_listbox = Listbox(self, font=("Arial", 12), width=30, height=10, bg="#2b2b2b", fg="white", cursor="hand2",selectbackground="#106a43",highlightcolor="#106a43", activestyle='none', justify=LEFT)
-        self.albums_listbox.grid(row=2, column=0, padx=(20, 0), pady=(10, 0), sticky="nsew")
+
+        
+        
+        self.albums_listbox = Listbox(self, font=("Arial", 12), width=40, height=15, bg="#2b2b2b", fg="white", cursor="hand2",selectbackground="#106a43",highlightcolor="#106a43", activestyle='none', justify=LEFT)
+        self.albums_listbox.grid(row=2, column=1, padx=(20, 0), pady=(10, 0), sticky="nsew")
         self.albums_listbox.grid_columnconfigure(0, weight=1) 
         
        
 
       
         scrollbar_albums = Scrollbar(self, orient=VERTICAL, command=self.albums_listbox.yview,troughcolor="#2b2b2b",width=20 )
-        scrollbar_albums.grid(row=2, column=1,pady=(2, 2), sticky="ns")
+        scrollbar_albums.grid(row=2, column=0,pady=(2, 2), sticky="ns")
         self.albums_listbox.configure(yscrollcommand=scrollbar_albums.set)
 
         # Configure the grid rows and columns to expand as needed
@@ -60,18 +68,17 @@ class Page1(Page):
         """
 
 
-        self.logo_label = CTkLabel(self, text="Utwory", font=CTkFont(size=20, weight="bold"), text_color="#2b2b2b")
-        self.logo_label.grid(row=0, column=2, padx=20, pady=(20, 10))
-
+        self.textbox_label = CTkLabel(self, text="Utwory", font=CTkFont(size=20, weight="bold"), text_color="#2b2b2b")
+        self.textbox_label.grid(row=3, column=1, padx=20, pady=(20, 10))
+      
+        self.textbox = CTkTextbox(self, width=300 ,text_color="white",corner_radius = 10, font=("Arial", 15))
+        self.textbox.grid(row=4, column=1,rowspan = 2, padx=(20, 0), pady=(10, 0), sticky="nsew")
+        
+        """
         scrollbar_tracks = Scrollbar(self, orient=VERTICAL, command=self.tarcks_listbox.yview,troughcolor="#2b2b2b",width=20 )
         scrollbar_tracks.grid(row=1, column=2,pady=(2, 2),rowspan = 2, sticky="ns")
         self.tracks_listbox.configure(yscrollcommand=scrollbar_tracks.set)
-
-        #self.textbox = CTkTextbox(self, width=300 ,text_color="white",corner_radius = 10, font=("Arial", 15))
-        #self.textbox.grid(row=1, column=2,rowspan = 2, padx=(20, 0), pady=(10, 0), sticky="nsew")
-        # Set row and column weights
-        
-
+        """
 
 
 
@@ -82,37 +89,35 @@ class Page1(Page):
 
         self.button_clicked = BooleanVar()
         self.button_clicked.set(False)
+
+
         self.albums_listbox.bind("<<ListboxSelect>>", self.show_tracks)
 
-    def print_entry_text(self):
-        entry_text = self.entry.get()
-        artist_id = self.sp_analyzer.get_artist_id(entry_text)
+    def enter_artist_name(self):
+        artist_name = self.entry.get()
+        artist_id = self.sp_analyzer.get_artist_id(artist_name)
         self.button_clicked.set(True)
-        albums = self.show_all_albums(artist_id)
-        self.remove_duplicates(albums)
+        self.show_all_albums(artist_id)
 
     def show_all_albums(self, artist_id):
         albums = self.sp_analyzer.get_all_albums(artist_id)
-        return set([album['name'] for album in albums])
-
-    def remove_duplicates(self, albums):
-        self.print_all_albums(albums)
-        self.pokaz_liste_albumow(albums)
-
-    def print_all_albums(self, albums):
+        albums =  set([album['name'] for album in albums])
         self.albums_listbox.delete(0, END)
         for album in albums:
             self.albums_listbox.insert(END, album)
+        self.album_selection(albums)
+  
+        
+    def album_selection(self, albums):
+        selected_album = self.albums_listbox.curselection()
+        if selected_album:
+            album_name = list(albums)[selected_album[0]]
+            album = [album for album in albums if album['name'] == album_name][0]
+            return album
+            #self.get_tracks_from_album(album['uri'])
 
-    def pokaz_liste_albumow(self, albums):
-        selection = self.albums_listbox.curselection()
-        if selection:
-            album_name = list(albums)[selection[0]]
-            album = [album for album in self.sp_analyzer.get_all_albums(self.sp_analyzer.get_artist_id(self.entry.get())) if album['name'] == album_name][0]
-            self.get_tracks_from_album(album['uri'])
 
-
-    def show_tracks(self,even):
+    def show_tracks(self, *args):
         selected_album_index = self.albums_listbox.curselection()[0]
         selected_album_name = self.albums_listbox.get(selected_album_index)
         artist_id = self.sp_analyzer.get_artist_id(self.entry.get())
@@ -120,13 +125,13 @@ class Page1(Page):
         selected_album = [album for album in albums if album['name'] == selected_album_name][0]
         tracks = self.sp_analyzer.get_tracks_from_album(selected_album['uri'])
         #self.print_track_info(track_info)
-        self.sp_analyzer.display_tracks(tracks) 
-        self.print_all_tracks(tracks) 
+        #self.sp_analyzer.display_tracks(tracks) 
+        self.insert_tracks_list_to_widget(tracks) 
         return tracks
         
 
 
-    def print_all_tracks(self, tracks):
+    def insert_tracks_list_to_widget(self, tracks):
         self.textbox.delete('1.0', END)
 
        # for track in tracks:
@@ -138,11 +143,18 @@ class Page1(Page):
             #print(f"{i + 1}. {track['name']} ({time_in_minutes} min)")
             self.textbox.insert(END, f"{i + 1}. {track['name']} ({time_in_minutes} min)"+ "\n") # wstaw tekst do panelu pierwszej zakładki
 
-    """
-        def print_all_tracks(self, tracks):
+
+
+
+
+"""
+
+    def print_all_tracks(self, tracks):
         utwory = self.sp_analyzer.display_tracks( tracks)
         print(utwory)
   
+
+
 
     def print_all_tracks(self, track_info):
         self.albums_listbox.delete(0, END)
@@ -159,9 +171,9 @@ class Page1(Page):
 
 
     def print_track_info(self, track_info):
-        print(track_info)
-    """
-
+       print(track_info)
+    
+"""
 
     
 

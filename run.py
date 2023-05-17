@@ -6,9 +6,10 @@ class Application:
     def main(self):
         
         root = Tk()
-        root.title('Page Switcher')
+        root.title('Spotify Crawler')
         #root.iconbitmap(".\\Pictures\\temp_icon.ico")
-        root.geometry('800x600')
+        #root.geometry('1920x1080')
+        root.state('zoomed')
         main_view = MainView(root)
         main_view.pack(fill='both', expand=True)
 

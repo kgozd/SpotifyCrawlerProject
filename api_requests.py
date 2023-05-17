@@ -21,7 +21,7 @@ class SpotifyAnalyzer:
             artist = result['artists']['items'][0]
             return  artist['id']
             
-        
+    """  
     def get_artist_info(self, id_artysty):
         artist = self.sp.artist(id_artysty)
         dict = {
@@ -35,6 +35,8 @@ class SpotifyAnalyzer:
         print(dumps(dict, indent=4))
 
         return None
+    """ 
+    """
     def get_album_info(self, album_name):
         result = self.sp.search(album_name, limit=1, type='album')
         if result['albums']['items']:
@@ -55,7 +57,7 @@ class SpotifyAnalyzer:
             print(dumps(dict, indent=4))
 
         return None
-    
+    """
     def get_all_albums(self, artist_id):
         albums = []
         results = self.sp.artist_albums(artist_id, album_type='album')
@@ -64,14 +66,14 @@ class SpotifyAnalyzer:
             results = self.sp.next(results)
             albums.extend(results['items'])
         return albums
-    
+    """
     def display_albums(self, albums):
         album_names = []
         for i, album in enumerate(albums):
             if album['name'] not in album_names:
                 album_names.append(album['name'])
                 return f"{len(album_names)}. {album['name']} ({album['release_date']})"
-            
+    """    
     
     def get_tracks_from_album(self, album_uri):
         tracks = []
@@ -81,12 +83,12 @@ class SpotifyAnalyzer:
             results = self.sp.next(results)
             tracks.extend(results['items'])
         return tracks
-    
+    """ 
     def display_tracks(self, tracks):
         for i, track in enumerate(tracks):
             time_in_minutes = round(track['duration_ms']/60000,2)
             print(f"{i + 1}. {track['name']} ({time_in_minutes} min)")
-    
+    """ 
     def get_track_info(self, track_uri):
 
         track = self.sp.track(track_uri)
@@ -118,6 +120,9 @@ class SpotifyAnalyzer:
             
         })
         print(dumps(dict, indent=4))
+
+
+        
     """        
     def get_all_albums(self, artist_id):
         albums = []
