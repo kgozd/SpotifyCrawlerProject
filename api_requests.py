@@ -36,7 +36,7 @@ class SpotifyAnalyzer:
 
         return None
     """ 
-    """
+    
     def get_album_info(self, album_name):
         result = self.sp.search(album_name, limit=1, type='album')
         if result['albums']['items']:
@@ -57,7 +57,7 @@ class SpotifyAnalyzer:
             print(dumps(dict, indent=4))
 
         return None
-    """
+    
     def get_all_albums(self, artist_id):
         albums = []
         results = self.sp.artist_albums(artist_id, album_type='album')
@@ -83,12 +83,12 @@ class SpotifyAnalyzer:
             results = self.sp.next(results)
             tracks.extend(results['items'])
         return tracks
-    """ 
+     
     def display_tracks(self, tracks):
         for i, track in enumerate(tracks):
             time_in_minutes = round(track['duration_ms']/60000,2)
             print(f"{i + 1}. {track['name']} ({time_in_minutes} min)")
-    """ 
+   
     def get_track_info(self, track_uri):
 
         track = self.sp.track(track_uri)
@@ -122,7 +122,7 @@ class SpotifyAnalyzer:
         print(dumps(dict, indent=4))
 
 
-        
+
     """        
     def get_all_albums(self, artist_id):
         albums = []
@@ -150,4 +150,3 @@ class SpotifyAnalyzer:
         """
           
         
-

@@ -1,4 +1,4 @@
-from tkinter import Frame, Label, Button, Tk, Entry, Listbox, Canvas, END, BooleanVar, Scrollbar, ttk, VERTICAL, LEFT
+from tkinter import Frame, Label, Button, Tk, Entry, Listbox, Canvas, END, BooleanVar, Scrollbar, ttk, VERTICAL, LEFT, EXTENDED, SINGLE, MULTIPLE 
 from api_requests import  SpotifyAuthenticator, SpotifyAnalyzer
 from config import client_id, client_secret
 from customtkinter import CTkScrollbar, CTkTabview, CTkButton, CTkEntry, set_appearance_mode,set_default_color_theme, CTkScrollableFrame, CTkTextbox, CTkLabel, CTkFont
@@ -20,7 +20,6 @@ class Page1(Page):
         super().__init__(parent, "Page 1")
         self.parent = parent
         self.create_widgets()
-        
        
     def create_widgets(self):
        
@@ -40,23 +39,32 @@ class Page1(Page):
         
 
         
-        self.listbox_label = CTkLabel(self, text="Albumy", font=CTkFont(size=20, weight="bold"), text_color="#2b2b2b")
-        self.listbox_label.grid(row=1, column=1, padx=20, pady=(20, 10))
+        self.albums_listbox_label = CTkLabel(self, text="Albumy", font=CTkFont(size=20, weight="bold"), text_color="#2b2b2b")
+        self.albums_listbox_label.grid(row=1, column=1, padx=20, pady=(20, 10))
 
-
-
-        
-        
-        self.albums_listbox = Listbox(self, font=("Arial", 12), width=40, height=15, bg="#2b2b2b", fg="white", cursor="hand2",selectbackground="#106a43",highlightcolor="#106a43", activestyle='none', justify=LEFT)
+        self.albums_listbox = Listbox(self, font=("Arial", 12), width=40, height=15, bg="#2b2b2b", fg="white", cursor="hand2",selectbackground="#106a43",highlightcolor="#106a43", activestyle='none', justify=LEFT,  selectmode=SINGLE)
         self.albums_listbox.grid(row=2, column=1, padx=(20, 0), pady=(10, 0), sticky="nsew")
         self.albums_listbox.grid_columnconfigure(0, weight=1) 
         
-       
-
-      
         scrollbar_albums = Scrollbar(self, orient=VERTICAL, command=self.albums_listbox.yview,troughcolor="#2b2b2b",width=20 )
         scrollbar_albums.grid(row=2, column=0,pady=(2, 2), sticky="ns")
         self.albums_listbox.configure(yscrollcommand=scrollbar_albums.set)
+
+
+
+        self.tracks_listbox_label = CTkLabel(self, text="Utwory", font=CTkFont(size=20, weight="bold"), text_color="#2b2b2b")
+        self.tracks_listbox_label.grid(row=3, column=1, padx=20, pady=(20, 10))
+        
+        self.tracks_listbox = Listbox(self, font=("Arial", 12), width=40, height=15, bg="#2b2b2b", fg="white", cursor="hand2",selectbackground="#106a43",highlightcolor="#106a43", activestyle='none', justify=LEFT, selectmode=SINGLE)
+        self.tracks_listbox.grid(row=4, column=1,rowspan = 2, padx=(20, 0), pady=(10, 0), sticky="nsew")
+        self.tracks_listbox.grid_columnconfigure(0, weight=1) 
+        
+        scrollbar_tracks = Scrollbar(self, orient=VERTICAL, command=self.albums_listbox.yview,troughcolor="#2b2b2b",width=20 )
+        scrollbar_tracks.grid(row=4, column=0,pady=(2, 2), sticky="ns")
+        self.tracks_listbox.configure(yscrollcommand=scrollbar_tracks.set)
+
+
+
 
         # Configure the grid rows and columns to expand as needed
     
@@ -67,14 +75,14 @@ class Page1(Page):
         self.tabview.tab("Lista Utworów").grid_columnconfigure(0, weight=1)  # configure grid of individual tabs
         """
 
-
+        """
         self.textbox_label = CTkLabel(self, text="Utwory", font=CTkFont(size=20, weight="bold"), text_color="#2b2b2b")
         self.textbox_label.grid(row=3, column=1, padx=20, pady=(20, 10))
       
         self.textbox = CTkTextbox(self, width=300 ,text_color="white",corner_radius = 10, font=("Arial", 15))
         self.textbox.grid(row=4, column=1,rowspan = 2, padx=(20, 0), pady=(10, 0), sticky="nsew")
         
-        """
+       
         scrollbar_tracks = Scrollbar(self, orient=VERTICAL, command=self.tarcks_listbox.yview,troughcolor="#2b2b2b",width=20 )
         scrollbar_tracks.grid(row=1, column=2,pady=(2, 2),rowspan = 2, sticky="ns")
         self.tracks_listbox.configure(yscrollcommand=scrollbar_tracks.set)
@@ -91,15 +99,16 @@ class Page1(Page):
         self.button_clicked.set(False)
 
 
-        self.albums_listbox.bind("<<ListboxSelect>>", self.show_tracks)
+        self.albums_listbox.bind("<<ListboxSelect>>", self.show_albums)
+        self.tracks_listbox.bind("<<ListboxSelect>>", self.show_track_info)
 
     def enter_artist_name(self):
         artist_name = self.entry.get()
         artist_id = self.sp_analyzer.get_artist_id(artist_name)
         self.button_clicked.set(True)
-        self.show_all_albums(artist_id)
+        self.insert_albums_to_listbox(artist_id)
 
-    def show_all_albums(self, artist_id):
+    def insert_albums_to_listbox(self, artist_id):
         albums = self.sp_analyzer.get_all_albums(artist_id)
         albums =  set([album['name'] for album in albums])
         self.albums_listbox.delete(0, END)
@@ -117,20 +126,49 @@ class Page1(Page):
             #self.get_tracks_from_album(album['uri'])
 
 
-    def show_tracks(self, *args):
+    def show_albums(self, event):
+        
         selected_album_index = self.albums_listbox.curselection()[0]
         selected_album_name = self.albums_listbox.get(selected_album_index)
         artist_id = self.sp_analyzer.get_artist_id(self.entry.get())
         albums = self.sp_analyzer.get_all_albums(artist_id)
         selected_album = [album for album in albums if album['name'] == selected_album_name][0]
-        tracks = self.sp_analyzer.get_tracks_from_album(selected_album['uri'])
+        album_id = selected_album['uri']
         #self.print_track_info(track_info)
         #self.sp_analyzer.display_tracks(tracks) 
-        self.insert_tracks_list_to_widget(tracks) 
-        return tracks
+        self.insert_tracks_to_listbox(album_id) 
+        print(album_id)
+        return album_id
         
+    
+        
+    def insert_tracks_to_listbox(self, album_id):
+        tracks = self.sp_analyzer.get_tracks_from_album(album_id)
+        self.tracks_listbox.delete(0, END)
+        for track in tracks:
+            self.tracks_listbox.insert(END, track['name'])
+        self.current_album_id = album_id
+        
+    
+    def track_selection(self, event):
+        selected_track_index = self.tracks_listbox.curselection()[0]
+        selected_track_name = self.tracks_listbox.get(selected_track_index)
+        tracks = self.sp_analyzer.get_tracks_from_album(self.selected_album['uri'])
+        selected_track = [track for track in tracks if track['name'] == selected_track_name][0]
+        self.show_track_info(selected_track)
+
+    def show_track_info(self, event):
+        selected_track_index = self.tracks_listbox.curselection()[0]
+        selected_track_name = self.tracks_listbox.get(selected_track_index)
+        tracks = self.sp_analyzer.get_tracks_from_album(self.current_album_id)
+        selected_track = [track for track in tracks if track['name'] == selected_track_name][0]
+        track_id = selected_track['uri']
+        track_stats = self.sp_analyzer.get_track_info(track_id)
+        print(track_stats)
 
 
+
+"""
     def insert_tracks_list_to_widget(self, tracks):
         self.textbox.delete('1.0', END)
 
@@ -147,7 +185,7 @@ class Page1(Page):
 
 
 
-"""
+
 
     def print_all_tracks(self, tracks):
         utwory = self.sp_analyzer.display_tracks( tracks)
