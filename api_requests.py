@@ -1,6 +1,8 @@
 from spotipy.oauth2 import SpotifyClientCredentials
 from spotipy import Spotify
 from json import dumps
+
+
 class SpotifyAuthenticator:
     def __init__(self, client_id, client_secret):
         self.client_credentials_manager = SpotifyClientCredentials(client_id, client_secret)
@@ -8,20 +10,17 @@ class SpotifyAuthenticator:
     def get_spotify_instance(self):
         return Spotify(client_credentials_manager=self.client_credentials_manager)
 
-    
 
 class SpotifyAnalyzer:
     def __init__(self, spotify_instance):
         self.sp = spotify_instance
  
-
     def get_artist_id(self, artist_name):
         result = self.sp.search(artist_name, limit=1, type='artist')
         if result['artists']['items']:
             artist = result['artists']['items'][0]
             return  artist['id']
             
-   
     def get_artist_info(self, id_artysty):
         artist = self.sp.artist(id_artysty)
         dict = {
@@ -33,13 +32,10 @@ class SpotifyAnalyzer:
         'artist_id': artist['id']
         }
         #print(dumps(dict, indent=4))
-
         return dict
    
-    
     def get_album_info(self, album_uri):
         album = self.sp.album(album_uri)
-        
         dict= {
             'name': album['name'], 
             'type': album['album_type'],
@@ -50,13 +46,10 @@ class SpotifyAnalyzer:
             'external_urls': album['external_urls']['spotify'],
             'images': album['images'],
             'image_url': album['images'][0]['url'] if album['images'] else None,
-
         }
-        
         #print(dumps(dict, indent=4))
         return dict
        
-    
     def get_all_albums(self, artist_id):
         albums = []
         results = self.sp.artist_albums(artist_id, album_type='album')
@@ -82,18 +75,17 @@ class SpotifyAnalyzer:
             results = self.sp.next(results)
             tracks.extend(results['items'])
         return tracks
-     
+    
+    """  
     def display_tracks(self, tracks):
         for i, track in enumerate(tracks):
             time_in_minutes = round(track['duration_ms']/60000,2)
             print(f"{i + 1}. {track['name']} ({time_in_minutes} min)")
-   
+    """     
+    
     def get_track_info(self, track_uri):
-
         track = self.sp.track(track_uri)
         audio_features = self.sp.audio_features(track_uri)[0]
-
-
         dict = ({
             'album_name': track['album']['name'], # nazwa albumu, na którym jest utwór
             'album_release_date': track['album']['release_date'], # data wydania albumu
@@ -115,12 +107,10 @@ class SpotifyAnalyzer:
             'tempo': audio_features['tempo'], # tempo utworu w uderzeniach na minutę
             'preview_url': track['preview_url'], # adres URL do fragmentu utworu do odsłuchania
             'external_urls': track['external_urls'], # zewnętrzne adresy URL związane z utworem
-            #'available_markets': track['available_markets'] # kraje, w których utwór jest dostępny
-            
+            #'available_markets': track['available_markets'] # kraje, w których utwór jest dostępny  
         })
         #print(dumps(dict, indent=4))
         return dict
-
 
     """        
     def get_all_albums(self, artist_id):
