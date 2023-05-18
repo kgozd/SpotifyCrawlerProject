@@ -21,7 +21,7 @@ class SpotifyAnalyzer:
             artist = result['artists']['items'][0]
             return  artist['id']
             
-    """  
+   
     def get_artist_info(self, id_artysty):
         artist = self.sp.artist(id_artysty)
         dict = {
@@ -32,31 +32,30 @@ class SpotifyAnalyzer:
         'image_url': artist['images'][0]['url'] if artist['images'] else None,
         'artist_id': artist['id']
         }
-        print(dumps(dict, indent=4))
+        #print(dumps(dict, indent=4))
 
-        return None
-    """ 
+        return dict
+   
     
-    def get_album_info(self, album_name):
-        result = self.sp.search(album_name, limit=1, type='album')
-        if result['albums']['items']:
-            album = result['albums']['items'][0]
-            dict= {
-                'name': album['name'], 
-                'type': album['album_type'],
-                'total_tracks': album["total_tracks"],
-                'uri': album['uri'],
-                'release_date': album["release_date"],
-                'artists': [artist['name'] for artist in album['artists']],
-                'external_urls': album['external_urls']['spotify'],
-                #'images': album['images'],
-                'image_url': album['images'][0]['url'] if album['images'] else None,
+    def get_album_info(self, album_uri):
+        album = self.sp.album(album_uri)
+        
+        dict= {
+            'name': album['name'], 
+            'type': album['album_type'],
+            'total_tracks': album["total_tracks"],
+            'uri': album['uri'],
+            'release_date': album["release_date"],
+            'artists': [artist['name'] for artist in album['artists']],
+            'external_urls': album['external_urls']['spotify'],
+            'images': album['images'],
+            'image_url': album['images'][0]['url'] if album['images'] else None,
 
-            }
-            
-            print(dumps(dict, indent=4))
-
-        return None
+        }
+        
+        #print(dumps(dict, indent=4))
+        return dict
+       
     
     def get_all_albums(self, artist_id):
         albums = []
@@ -119,8 +118,8 @@ class SpotifyAnalyzer:
             #'available_markets': track['available_markets'] # kraje, w których utwór jest dostępny
             
         })
-        print(dumps(dict, indent=4))
-
+        #print(dumps(dict, indent=4))
+        return dict
 
 
     """        
