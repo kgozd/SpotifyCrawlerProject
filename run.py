@@ -4,7 +4,7 @@ from window import Tk, MainView
 #from json import dumps
 class Application:
     def main(self):
-        
+         
         root = Tk()
         root.title('Spotify Crawler')
         #root.iconbitmap(".\\Pictures\\temp_icon.ico")

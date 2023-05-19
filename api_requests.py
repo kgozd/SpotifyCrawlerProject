@@ -7,6 +7,7 @@ class SpotifyAuthenticator:
     def __init__(self, client_id, client_secret):
         self.client_credentials_manager = SpotifyClientCredentials(client_id, client_secret)
     
+    
     def get_spotify_instance(self):
         return Spotify(client_credentials_manager=self.client_credentials_manager)
 

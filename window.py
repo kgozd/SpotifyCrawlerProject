@@ -16,10 +16,11 @@ from customtkinter import(
 from io import BytesIO
 from PIL import ImageTk, Image, ImageDraw
 from urllib.request import urlopen
-
+ 
 
 
 """
+
     def insert_tracks_list_to_widget(self, tracks):
         self.textbox.delete('1.0', END)
 

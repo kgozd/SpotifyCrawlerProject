@@ -9,7 +9,7 @@ from tkinter import(
 from customtkinter import( 
     CTkScrollbar, CTkTabview, CTkButton, CTkEntry,
     set_appearance_mode,set_default_color_theme, CTkScrollableFrame,
-    CTkTextbox, CTkLabel, CTkFont, CTkImage
+    CTkTextbox, CTkLabel, CTkFont, CTkImage 
 )  
 
 
