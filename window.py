@@ -98,7 +98,7 @@ class MainView(Frame):
         self.sidebar.pack(side='left', fill='y')
         page_names = ['Page1', 'Page2', 'Page3']
         for name in page_names:
-            button = CTkButton(self.sidebar, text=name, height=50, width= 100,text_color="#000000",fg_color="#4ddf5d", font=("Arial", 15), command=lambda name=name: self.show_page(name), hover_color="#3bac47")
+            button = CTkButton(self.sidebar, text=name, height=50, width= 100,text_color="#000000",fg_color="#4ddf5d", font=("Arial", 15, 'bold'), command=lambda name=name: self.show_page(name), hover_color="#3bac47")
             button.pack(side='top', pady=10, padx=10)
 
     def create_page_container(self):

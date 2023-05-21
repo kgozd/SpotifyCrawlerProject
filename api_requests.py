@@ -59,14 +59,7 @@ class SpotifyAnalyzer:
             results = self.sp.next(results)
             albums.extend(results['items'])
         return albums
-    """
-    def display_albums(self, albums):
-        album_names = []
-        for i, album in enumerate(albums):
-            if album['name'] not in album_names:
-                album_names.append(album['name'])
-                return f"{len(album_names)}. {album['name']} ({album['release_date']})"
-    """    
+ 
     
     def get_tracks_from_album(self, album_uri):
         tracks = []
@@ -77,12 +70,6 @@ class SpotifyAnalyzer:
             tracks.extend(results['items'])
         return tracks
     
-    """  
-    def display_tracks(self, tracks):
-        for i, track in enumerate(tracks):
-            time_in_minutes = round(track['duration_ms']/60000,2)
-            print(f"{i + 1}. {track['name']} ({time_in_minutes} min)")
-    """     
     
     def get_track_info(self, track_uri):
         track = self.sp.track(track_uri)
@@ -113,30 +100,4 @@ class SpotifyAnalyzer:
         #print(dumps(dict, indent=4))
         return dict
 
-    """        
-    def get_all_albums(self, artist_id):
-        albums = []
-        results = self.sp.artist_albums(artist_id, album_type='album')
-        albums.extend(results['items'])
-        while results['next']:
-            results = self.sp.next(results)
-            albums.extend(results['items'])
-        
-        # Print list of albums and allow user to choose which album to view details
-        print("Albums:")
-        for i, album in enumerate(albums):
-            print(f"{i+1}. {album['name']} ({album['release_date']})")
-        album_choice = input("Choose an album (enter the number): ")
-        
-        # Get details of chosen album
-        chosen_album = albums[int(album_choice)-1]
-        album_dict = {
-            'name': chosen_album['name'],
-            'release_date': chosen_album['release_date'],
-            'total_tracks': chosen_album['total_tracks'],
-            'uri': chosen_album['uri']
-        }
-        print(dumps(album_dict, indent=4))
-        """
-          
         

@@ -10,7 +10,7 @@ from tkinter import(
 ) 
 from customtkinter import(
     CTkScrollbar, CTkTabview, CTkButton, CTkEntry,
-    set_appearance_mode,set_default_color_theme, CTkScrollableFrame,
+    CTkScrollableFrame,
     CTkTextbox, CTkLabel, CTkFont, CTkImage,CTkFrame,CTk
 )  
 from io import BytesIO
@@ -71,7 +71,7 @@ class Page1(Page):
         self.artist_entry.grid_columnconfigure(0, weight=1)  # configure grid of individual tabs
 
 
-        self.button_to_request = CTkButton(self, text="Pobierz dane ",font=("Arial", 18), height=40, fg_color="#4ddf5d",text_color="#000000", command=self.enter_artist_name,  hover_color="#3bac47" )
+        self.button_to_request = CTkButton(self, text="Pobierz dane ",font=("Arial", 18,'bold'), height=40, fg_color="#4ddf5d",text_color="#000000", command=self.enter_artist_name,  hover_color="#3bac47")
         self.button_to_request.grid(row=0, column=3, padx=(20, 0), pady=(15, 10), sticky="nsew", columnspan=1)
         self.button_to_request.grid_columnconfigure(0, weight=1) 
 
@@ -256,26 +256,18 @@ class Page1(Page):
             self.tracks_stats_widget1.add_list_item("Tempo", track_tempo)
 
 
-
-            """
-            self.textbox.delete('1.0', END)
-            for  i in track_stats:
-                #time_in_minutes = round(track['duration_ms']/60000,2)
-                
-                self.textbox.insert(END, f" {i} ")
-            """
         except:
             pass
         
 
-    def show_album_cover_from_url(self, album_cover_url,  width=110, height=110):
+    def show_album_cover_from_url(self, album_cover_url,  width=115, height=115):
 
         album_cover_data = urlopen(album_cover_url).read()
         album_cover = Image.open(BytesIO(album_cover_data))
         photo = CTkImage(album_cover, size=(width, height))
         self.album_cover_label.configure(image=photo,text = "")
 
-    def show_artist_image_from_url(self, artist_image_url,  width=110, height=110):
+    def show_artist_image_from_url(self, artist_image_url,  width=115, height=115):
         artist_image_url = urlopen(artist_image_url).read()
         album_image = Image.open(BytesIO(artist_image_url))
         photo = CTkImage(album_image, size=(width, height))
