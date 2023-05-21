@@ -11,7 +11,7 @@ from tkinter import(
 from customtkinter import(
     CTkScrollbar, CTkTabview, CTkButton, CTkEntry,
     set_appearance_mode,set_default_color_theme, CTkScrollableFrame,
-    CTkTextbox, CTkLabel, CTkFont, CTkImage 
+    CTkTextbox, CTkLabel, CTkFont, CTkImage,CTkFrame,CTk
 )  
 from io import BytesIO
 from PIL import ImageTk, Image, ImageDraw
@@ -19,56 +19,93 @@ from urllib.request import urlopen
 from functools import partial
 
 
+class ListItem(CTkFrame):
+    def __init__(self, parent, header, text):
+        super().__init__(parent, bg_color='#242424')
+
+        header_label = ttk.Label(self, text=header, foreground='white', background='#2b2b2b', font=('Arial', 12, 'bold'))
+        header_label.grid(row=0, column=0, padx=10,pady=10)
+
+        bullet_label = ttk.Label(self, text='\u2022', foreground='#4ddf5d', background='#2b2b2b', font=('Arial', 12, 'bold'))
+        bullet_label.grid(row=0, column=1,padx=10,pady=10)
+
+        text_label = ttk.Label(self, text=text, foreground='white',font=('Arial', 11,'bold'), background='#2b2b2b')
+        text_label.grid(row=0, column=2,padx=10,pady=10)
 
 
+class ListWithItems(CTkFrame):
+    def __init__(self, parent):
+        super().__init__(parent, bg_color='#242424')
+        self.parent = parent
+        self.grid(row=3, column=3)
+        self.list_items = []
+        # Ramka listy
+        self.list_frame = None
+        self.list_frame = CTkFrame(self, bg_color='#242424', corner_radius=50)
+        self.list_frame.grid(row=0, column=0)
 
+    def add_list_item(self, header, text):
+        item = ListItem(self.list_frame, header, text)
+        item.grid(sticky='new')
+        self.list_items.append(item)
 
-
-
-
+    def clear_list(self):
+        for item in self.list_items:
+            item.destroy()
+        self.list_items = []
 
 class Page1(Page):
     def __init__(self, parent):
         super().__init__(parent, "Page 1")
         self.parent = parent
         self.create_widgets()
-       
+        self.artist_stats_widget1 = None
+        self.albums_stats_widget1 = None
+        self.tracks_stats_widget1 = None
     def create_widgets(self):
-       
-        self.artist_entry = CTkEntry(self,font=("Arial", 18), height=40,  placeholder_text="Wpisz Nazwę Artysty")
-        self.artist_entry.grid(row=0, column=1,  padx=(20, 0), pady=(10, 10),  sticky="nsew")
+
+    
+
+        self.artist_entry = CTkEntry(self,font=("Arial", 18), height=40, width=50,  placeholder_text="Wpisz Nazwę Artysty")
+        self.artist_entry.grid(row=0, column=1,  padx=(25, 0), pady=(15, 5),  sticky="nsew")
         self.artist_entry.grid_columnconfigure(0, weight=1)  # configure grid of individual tabs
 
 
-        self.button_to_request = CTkButton(self, text="Pobierz infromacje o artyście ",font=("Arial", 18), height=40, fg_color="#4ddf5d",text_color="#000000", command=self.enter_artist_name,  hover_color="#3bac47" )
-        self.button_to_request.grid(row=0, column=3, padx=(20, 0), pady=(10, 10), sticky="nsew")
+        self.button_to_request = CTkButton(self, text="Pobierz dane ",font=("Arial", 18), height=40, fg_color="#4ddf5d",text_color="#000000", command=self.enter_artist_name,  hover_color="#3bac47" )
+        self.button_to_request.grid(row=0, column=3, padx=(20, 0), pady=(15, 10), sticky="nsew", columnspan=1)
         self.button_to_request.grid_columnconfigure(0, weight=1) 
 
         
         self.artist_info_label = CTkLabel(self, text="Informacje o Artyście", font=CTkFont(size=20, weight="bold"), text_color="#f0f0f0")
-        self.artist_info_label.grid(row=1, column=3, padx=(40,20), pady=(20, 10), columnspan=2, sticky="nsew")
+        self.artist_info_label.grid(row=1, column=3, padx=(40,20), pady=(5, 10), columnspan=3, sticky="new")
 
         
-        self.artist_image_label = CTkLabel(self, text="", font=CTkFont(size=20, weight="bold"), text_color="#f0f0f0")
-        self.artist_image_label.grid(row=2, column=3, padx=(40,20), pady=(20, 10), columnspan=2, sticky="new")
+        self.artist_image_label = CTkLabel(self, text="Wybierz artystę", font=CTkFont(size=20, weight="bold"), text_color="#f0f0f0")
+        self.artist_image_label.grid(row=2, column=3, padx=(40,20), pady=(20, 10),  sticky="nw")
 
 
         self.album_info_label = CTkLabel(self, text="Informacje o Albumie", font=CTkFont(size=20, weight="bold"), text_color="#f0f0f0")
-        self.album_info_label.grid(row=1, column=4, padx=(120,20), pady=(20, 10), columnspan=2, sticky="nsew")
+        self.album_info_label.grid(row=3, column=3, padx=(40,20), pady=(10, 10), columnspan=3, sticky="new")
 
 
-        self.album_cover_label = CTkLabel(self, text="", font=CTkFont(size=20, weight="bold"), text_color="#f0f0f0")
-        self.album_cover_label.grid(row=2, column=4, padx=(120,20), pady=(20, 10), columnspan=2, sticky="new")
+        self.album_cover_label = CTkLabel(self, text="Wybierz album", font=CTkFont(size=20, weight="bold"), text_color="#f0f0f0")
+        self.album_cover_label.grid(row=4, column=3, padx=(40,20), pady=(10, 10), columnspan=1, sticky="nw")
+
+
+        self.tracks_info_label = CTkLabel(self, text="Informacje o Utworze", font=CTkFont(size=20, weight="bold"), text_color="#f0f0f0")
+        self.tracks_info_label.grid(row=7, column=3, padx=(40,20), pady=(5, 5), columnspan=3,sticky="nsew")
+
+
 
 
         self.albums_listbox_label = CTkLabel(self, text="Albumy", font=CTkFont(size=20, weight="bold"), text_color="#f0f0f0")
-        self.albums_listbox_label.grid(row=1, column=1, padx=20, pady=(20, 10))
+        self.albums_listbox_label.grid(row=1, column=1, padx=20, pady=(5, 5))
         self.albums_listbox = Listbox(self, font=("Arial", 12), width=40, height=15, bg="#2b2b2b", fg="white", cursor="hand2", selectbackground="#106a43",highlightbackground="#4ddf5d", highlightcolor="#4ddf5d", activestyle='none', justify=LEFT, selectmode=SINGLE,relief="flat", borderwidth=3)
-        self.albums_listbox.grid(row=2, column=1, padx=(20, 0), pady=(10, 0), sticky="nsew")
+        self.albums_listbox.grid(row=2, column=1, padx=(20, 0), pady=(0, 0), sticky="nsew",rowspan=3)
         self.albums_listbox.grid_columnconfigure(0, weight=1)
 
         scrollbar_frame = Frame(self)
-        scrollbar_frame.grid(row=2, column=2, padx=(0, 0), pady=(10, 0), sticky="ns")
+        scrollbar_frame.grid(row=2, column=2, padx=(0, 0), pady=(0, 0), sticky="ns",rowspan=4)
         scrollbar_style = ttk.Style()
         scrollbar_style.configure("Custom.Vertical.TScrollbar", troughcolor="#2b2b2b", background="#106a43", gripcount=0, gripmargin=0, gripstyle="n", width=20)
         scrollbar_albums = ttk.Scrollbar(scrollbar_frame, orient=VERTICAL, command=self.albums_listbox.yview, style="Custom.Vertical.TScrollbar")
@@ -77,45 +114,27 @@ class Page1(Page):
 
 
         self.tracks_listbox_label = CTkLabel(self, text="Utwory", font=CTkFont(size=20, weight="bold"), text_color="#f0f0f0")
-        self.tracks_listbox_label.grid(row=3, column=1, padx=20, pady=(20, 10))
+        self.tracks_listbox_label.grid(row=7, column=1, padx=20, pady=(5, 5))
         self.tracks_listbox = Listbox(self, font=("Arial", 12), width=40, height=15, bg="#2b2b2b", fg="white", cursor="hand2", selectbackground="#106a43",highlightbackground="#4ddf5d", highlightcolor="#4ddf5d", activestyle='none', justify=LEFT, selectmode=SINGLE,relief="flat", borderwidth=3)
-        self.tracks_listbox.grid(row=4, column=1, padx=(20, 0), pady=(10, 0), sticky="nsew")
+        self.tracks_listbox.grid(row=8, column=1, padx=(20, 0), pady=(0, 0), sticky="nsew")
         self.tracks_listbox.grid_columnconfigure(0, weight=1)
 
         scrollbar_frame = Frame(self)
-        scrollbar_frame.grid(row=4, column=2, padx=(0, 0), pady=(10, 0), sticky="ns")
+        scrollbar_frame.grid(row=8, column=2, padx=(0, 0), pady=(0, 0), sticky="ns")
         scrollbar_style = ttk.Style()
         scrollbar_style.configure("Custom.Vertical.TScrollbar", troughcolor="#2b2b2b", background="#106a43", gripcount=0, gripmargin=0, gripstyle="n", width=20)
         scrollbar_tracks = ttk.Scrollbar(scrollbar_frame, orient=VERTICAL, command=self.tracks_listbox.yview, style="Custom.Vertical.TScrollbar")
         scrollbar_tracks.pack(fill=Y, side=RIGHT)
         self.tracks_listbox.configure(yscrollcommand=scrollbar_tracks.set)
 
-
+        
 
         self.button_clicked = BooleanVar()
         self.button_clicked.set(False)
         self.albums_listbox.bind("<<ListboxSelect>>", self.show_albums)
         self.tracks_listbox.bind("<<ListboxSelect>>", self.show_track_info)
     
-        """
-        self.tabview = CTkTabview(self,height=200, width=200,text_color="white", command= self.show_track_info)
-        self.tabview.grid(row=3, column=3, rowspan = 1,padx=(200, 0), pady=(10, 0), sticky="nsew")
-        self.tabview.add("Lista Utworów")
-        self.tabview.tab("Lista Utworów").grid_columnconfigure(0, weight=1)  # configure grid of individual tabs
-        """
-
-        """
-        self.textbox_label = CTkLabel(self, text="Utwory", font=CTkFont(size=20, weight="bold"), text_color="#2b2b2b")
-        self.textbox_label.grid(row=3, column=1, padx=20, pady=(20, 10))
-      
-        self.textbox = CTkTextbox(self, width=300 ,text_color="white",corner_radius = 10, font=("Arial", 15))
-        self.textbox.grid(row=4, column=1,rowspan = 2, padx=(20, 0), pady=(10, 0), sticky="nsew")
-        
-       
-        scrollbar_tracks = Scrollbar(self, orient=VERTICAL, command=self.tarcks_listbox.yview,troughcolor="#2b2b2b",width=20 )
-        scrollbar_tracks.grid(row=1, column=2,pady=(2, 2),rowspan = 2, sticky="ns")
-        self.tracks_listbox.configure(yscrollcommand=scrollbar_tracks.set)
-        """
+    
    
     def enter_artist_name(self):
         artist_name = self.artist_entry.get()
@@ -124,13 +143,25 @@ class Page1(Page):
         self.button_clicked.set(True)
         artist_stats= self.sp_analyzer.get_artist_info(artist_id)
         artist_image_url = artist_stats['image_url']
-        _artist_followers = artist_stats['followers']
-        _artist_genres = artist_stats['genres']
+        artist_followers = artist_stats['followers']
+        artist_genres = artist_stats['genres']
+        
+        if self.artist_stats_widget1 is not None:
+            self.artist_stats_widget1.clear_list()
+        else:
+            self.artist_stats_widget1 = ListWithItems(self)
+            self.artist_stats_widget1.grid(row=2, column=4, padx=(5, 5), pady=(10, 10), columnspan=1, sticky="nw")
+        #self.artist_stats_widget1.clear_list()
+        self.artist_stats_widget1.add_list_item("Nazwa Artysty", artist_name)
+        self.artist_stats_widget1.add_list_item("Obserwujący", artist_followers)
+        self.artist_stats_widget1.add_list_item("Gatunki", artist_genres)
         self.insert_albums_to_listbox()
+
         self.show_artist_image_from_url(artist_image_url)
 
 
     def insert_albums_to_listbox(self):
+
         albums = self.sp_analyzer.get_all_albums(self.artist_id)
         self.albums= albums
         albums_names =  set([album['name'] for album in albums])
@@ -150,6 +181,7 @@ class Page1(Page):
 
     def show_albums(self, event):
         try:
+
             selected_album_index = self.albums_listbox.curselection()[0]
             selected_album_name = self.albums_listbox.get(selected_album_index)
             #print(albums_names)
@@ -161,6 +193,22 @@ class Page1(Page):
             self.insert_tracks_to_listbox() 
             album_stats = self.sp_analyzer.get_album_info(album_id)
             album_cover_url = album_stats['image_url']
+            album_name = album_stats['name']
+            album_total_tracks = album_stats['total_tracks']
+            album_release_date = album_stats['release_date']
+
+
+
+
+            if self.albums_stats_widget1 is not None:
+                self.albums_stats_widget1.clear_list()
+            else:
+                self.albums_stats_widget1 = ListWithItems(self)
+                self.albums_stats_widget1.grid(row=4, column=4,padx=(5,5), pady=(10, 10),columnspan=1,sticky="nw")
+            self.albums_stats_widget1.add_list_item("Nazwa Albumu", album_name)
+            self.albums_stats_widget1.add_list_item("Liczba Utworów", album_total_tracks)
+            self.albums_stats_widget1.add_list_item("Data wydania", album_release_date)
+
             self.show_album_cover_from_url(album_cover_url)       
         except:
             pass
@@ -190,7 +238,25 @@ class Page1(Page):
             selected_track = [track for track in tracks if track['name'] == selected_track_name][0]
             track_id = selected_track['uri']
             track_stats = self.sp_analyzer.get_track_info(track_id)
-            print(track_stats)
+            track_duration = f'{track_stats["duration minutes"]} minuty'
+            track_danceability = track_stats['danceability']
+            track_energy = track_stats['energy']
+            track_loudness = track_stats['loudness']
+            track_tempo = track_stats['tempo']
+            
+            if self.tracks_stats_widget1 is not None:
+                self.tracks_stats_widget1.clear_list()
+            else:
+                self.tracks_stats_widget1 = ListWithItems(self)
+            self.tracks_stats_widget1.grid(row=8, column=4,padx=(5,5), pady=(10, 10),columnspan=1,sticky="nw")
+            self.tracks_stats_widget1.add_list_item("Czas trwania", track_duration)
+            self.tracks_stats_widget1.add_list_item("Taneczność", track_danceability)
+            self.tracks_stats_widget1.add_list_item("Energia", track_energy)
+            self.tracks_stats_widget1.add_list_item("Głośność", track_loudness)
+            self.tracks_stats_widget1.add_list_item("Tempo", track_tempo)
+
+
+
             """
             self.textbox.delete('1.0', END)
             for  i in track_stats:
@@ -202,16 +268,17 @@ class Page1(Page):
             pass
         
 
-    def show_album_cover_from_url(self, album_cover_url,  width=150, height=150):
+    def show_album_cover_from_url(self, album_cover_url,  width=110, height=110):
+
         album_cover_data = urlopen(album_cover_url).read()
         album_cover = Image.open(BytesIO(album_cover_data))
         photo = CTkImage(album_cover, size=(width, height))
-        self.album_cover_label.configure(image=photo)
+        self.album_cover_label.configure(image=photo,text = "")
 
-    def show_artist_image_from_url(self, artist_image_url,  width=150, height=150):
+    def show_artist_image_from_url(self, artist_image_url,  width=110, height=110):
         artist_image_url = urlopen(artist_image_url).read()
         album_image = Image.open(BytesIO(artist_image_url))
         photo = CTkImage(album_image, size=(width, height))
-        self.artist_image_label.configure(image=photo)
+        self.artist_image_label.configure(image=photo, text="")
 
     
