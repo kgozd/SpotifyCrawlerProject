@@ -12,7 +12,7 @@ class SpotifyAuthenticator:
         return Spotify(client_credentials_manager=self.client_credentials_manager)
 
 
-class SpotifyAnalyzer:
+class SpotifyRequester:
     def __init__(self, spotify_instance):
         self.sp = spotify_instance
  

@@ -1,7 +1,10 @@
 config.py
 run.spec
 temp_music.mp3
-
+projekt_POC.code-workspace
+schemat_plików_projekt_POC.vsdx
+Pictures/sc_icon.ico
+Pictures/sc_icon.png
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -163,3 +166,4 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
+sqllitedb/baza_danych.db

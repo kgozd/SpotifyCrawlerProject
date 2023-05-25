@@ -1,6 +1,7 @@
 #my libraries
 from page import Page
 from page_1 import Page1
+from page_2 import Page2
 #additional libraries
 from tkinter import(
     Frame, Label, Button, Tk, 
@@ -53,21 +54,6 @@ from urllib.request import urlopen
 
     
 
-class Page2(Page):
-    def __init__(self, parent):
-        super().__init__(parent, "Page 2")
-        self.create_widgets()
-
-    def create_widgets(self):
-        
-        self.listbox = Listbox(self, font=("Arial", 12))
-        for i in range(10):
-            self.listbox.insert(END, "Item %d" % i)
-        self.listbox.grid(row=4, column=2)
-        self.listbox.bind('<Configure>', self.on_select)
-
-    def on_select(self, event):
-        self.listbox.configure(height=self.listbox.size())
 
 
 class Page3(Page):
@@ -94,11 +80,11 @@ class MainView(Frame):
         self.create_page_container()
 
     def create_sidebar(self):
-        self.sidebar = Frame(self, bg='#2b2b2b', width=200)
+        self.sidebar = Frame(self, bg='#2b2b2b', width=150)
         self.sidebar.pack(side='left', fill='y')
         page_names = ['Page1', 'Page2', 'Page3']
         for name in page_names:
-            button = CTkButton(self.sidebar, text=name, height=50, width= 100,text_color="#000000",fg_color="#4ddf5d", font=("Arial", 15, 'bold'), command=lambda name=name: self.show_page(name), hover_color="#3bac47")
+            button = CTkButton(self.sidebar, text=name, height=50, width= 150,text_color="#000000",fg_color="#4ddf5d", font=("Arial", 15, 'bold'), command=lambda name=name: self.show_page(name), hover_color="#3bac47")
             button.pack(side='top', pady=10, padx=10)
 
     def create_page_container(self):
