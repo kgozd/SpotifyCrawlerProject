@@ -1,7 +1,8 @@
 from spotipy.oauth2 import SpotifyClientCredentials
 from spotipy import Spotify
 from json import dumps
-
+import asyncio
+import aiohttp
 
 class SpotifyAuthenticator:
     def __init__(self, client_id, client_secret):
@@ -75,12 +76,12 @@ class SpotifyRequester:
         track = self.sp.track(track_uri)
         audio_features = self.sp.audio_features(track_uri)[0]
         dict = ({
+            'track_uri': track_uri,
             'album_name': track['album']['name'], # nazwa albumu, na którym jest utwór
             'album_release_date': track['album']['release_date'], # data wydania albumu
             'artist_name': track['artists'][0]['name'], # nazwa pierwszego wykonawcy utworu
-            'artist_genres': self.sp.artist(track['artists'][0]['id'])['genres'], # gatunki muzyczne wykonawcy
             'name': track['name'], 
-            'duration minutes': round(track['duration_ms']/60000,2),
+            'duration_mins': round(track['duration_ms']/60000,2),
             'popularity': track['popularity'],
             'danceability': audio_features['danceability'], # wskaźnik taneczności utworu
             'energy': audio_features['energy'], # wskaźnik energiczności utworu
@@ -95,9 +96,11 @@ class SpotifyRequester:
             'tempo': audio_features['tempo'], # tempo utworu w uderzeniach na minutę
             'preview_url': track['preview_url'], # adres URL do fragmentu utworu do odsłuchania
             'external_urls': track['external_urls'], # zewnętrzne adresy URL związane z utworem
-            #'available_markets': track['available_markets'] # kraje, w których utwór jest dostępny  
+            'available_markets': track['available_markets'], # kraje, w których utwór jest dostępny
+            'artist_genres': self.sp.artist(track['artists'][0]['id'])['genres'] # gatunki muzyczne wykonawcy
+  
         })
         #print(dumps(dict, indent=4))
         return dict
 
-        
+  

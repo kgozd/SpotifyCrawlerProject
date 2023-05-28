@@ -4,13 +4,82 @@ from config import client_id, client_secret
 
 #additional libraries
 from tkinter import(
-    Frame, ttk, Label
+    Frame, ttk, Label,Toplevel,Button
 ) 
 from customtkinter import( 
     CTkScrollbar, CTkTabview, CTkButton, CTkEntry,
     set_appearance_mode,set_default_color_theme, CTkScrollableFrame,
     CTkTextbox, CTkLabel, CTkFont, CTkImage,CTkFrame 
 )  
+
+
+from PIL import Image, ImageTk
+from os.path import dirname, join, abspath
+
+class CustomMessage:
+    def __init__(self, root):
+        self.root = root
+        self.my_labels = Labele(self)
+
+    def show_custom_error_message(self,current_dir, title,  message, icon):
+        dialog = Toplevel()
+        dialog.title(title)
+        dialog.configure(bg="#2b2b2b")
+        dialog.geometry("340x120")
+        path = join(current_dir, 'Pictures\\sc_icon.ico')
+        dialog.iconbitmap(path)
+        #current_dir = dirname(abspath(__file__))
+        # Słownik mapujący nazwy ikon na odpowiadające im ścieżki obrazów
+        image_paths = {
+            "error_icon": join(current_dir, 'Pictures\\error_icon.png'),
+            "warning_icon": join(current_dir, 'Pictures\\warning_icon.png'),
+            "info_icon": join(current_dir, 'Pictures\\info_icon.png'),
+            "save_icon": join(current_dir, 'Pictures\\save_icon.png')
+        }
+
+        # Sprawdzenie, czy nazwa ikony istnieje w słowniku
+        if icon in image_paths:
+            image_path = image_paths[icon]
+        else:
+            # Domyślna ścieżka obrazu w przypadku braku dopasowania
+            image_path = join(current_dir, 'Pictures\\info_icon.png')
+
+        # Załadowanie obrazka
+        image = Image.open(image_path)
+
+        # Zmiana rozmiaru obrazka
+        desired_size = (30, 30)  # Nowy rozmiar obrazka
+        resized_image = image.resize(desired_size)
+
+        # Konwersja obrazka do obiektu ImageTk
+        error_image = ImageTk.PhotoImage(resized_image)
+
+        error_label = Label(dialog, image=error_image, bg="#2b2b2b")
+        error_label.grid(row=0, column=0, padx=(15, 10), pady=(30, 5))
+        
+
+        message_label = Label(dialog, text=message,font=("Arial", 9, "bold"), bg="#2b2b2b", fg="#f0f0f0", padx=10, pady=10)
+        message_label.grid(row=0, column=1, padx=(0, 20), pady=(30, 5), sticky="w")
+
+       
+
+
+        ok_button = CTkButton(dialog, text="OK",font=("Arial", 12,'bold'), height=20, width =40,fg_color="#4ddf5d",
+                                           text_color="#000000", command=dialog.destroy,  hover_color="#3bac47")
+        ok_button.grid(row=1, column=1, pady=(10, 10), padx=(0,20), columnspan=2, sticky="nse")
+ 
+        dialog.columnconfigure(0, weight=0)
+        dialog.columnconfigure(1, weight=1)
+        dialog.rowconfigure(0, weight=1)
+
+        dialog.transient(self.root)
+        dialog.grab_set()
+        self.root.wait_window(dialog)
+
+
+
+
+
 
 class ListItem(CTkFrame):
     def __init__(self, parent, header, text):
@@ -47,15 +116,7 @@ class ListWithItems(CTkFrame):
             item.destroy()
         self.list_items = []
 
-class Labele:
-    def __init__(self, parent):
-        self.parent = parent
 
-    def create_label(self, text, font_size=20, font_weight="bold", text_color="#f0f0f0",
-                     row=0, column=0, padx=(0, 0), pady=(0, 0), columnspan=1, sticky=""):
-        label = CTkLabel(self.parent, text=text, font=("Arial", font_size, font_weight), text_color=text_color)
-        label.grid(row=row, column=column, padx=padx, pady=pady, columnspan=columnspan, sticky=sticky)
-        return label
 """
 class Buttons:
     def __init__(self, parent):
@@ -99,6 +160,19 @@ class Page(Frame):
         super().__init__(parent, bg="#242424")
         self.name = name
         self.sp_authenticator = SpotifyAuthenticator(client_id, client_secret) # Replace client_id and client_secret with your own Spotify API credentials
-        self.sp_analyzer = SpotifyRequester(self.sp_authenticator.get_spotify_instance())
+        self.sp_requester = SpotifyRequester(self.sp_authenticator.get_spotify_instance())
         set_appearance_mode("system")
         set_default_color_theme("green")
+
+
+
+
+class Labele:
+    def __init__(self, parent):
+        self.parent = parent
+
+    def create_label(self, text, font_size=20, font_weight="bold", text_color="#f0f0f0",
+                     row=0, column=0, padx=(0, 0), pady=(0, 0), columnspan=1, sticky=""):
+        label = CTkLabel(self.parent, text=text, font=("Arial", font_size, font_weight), text_color=text_color)
+        label.grid(row=row, column=column, padx=padx, pady=pady, columnspan=columnspan, sticky=sticky)
+        return label
