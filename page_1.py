@@ -21,7 +21,7 @@ from functools import partial
 from os import getcwd
 from os.path import dirname, join, abspath
 from spotipy.exceptions import SpotifyException
-import threading
+from threading import Thread
 from  tkinter.messagebox import showerror
 from time import sleep
 from concurrent.futures import ThreadPoolExecutor
@@ -223,11 +223,11 @@ class Page1(Page):
 
         
     def run_in_thread_create_db(self):
-        threading.Thread(target=self.creating_db).start()
+        Thread(target=self.creating_db).start()
 
     def start_saving(self):
-        self.button_to_save_to_db.configur
-        e(state="disabled")  
+        self.button_to_save_to_db.configure(state="disabled")  
+        
         self.progress.grid(row=0, column=6, columnspan=1, padx=10, pady=10)  
 
 
@@ -258,16 +258,28 @@ class Page1(Page):
         
             db_path = join(self.current_dir, 'baza_danych.db')
             self.db.connect(db_path)
-            self.db.create_table(first_track_stats)
-            threading.Thread(target=self.start_saving).start()
+            table_name = "SPotify"
+            self.db.create_table(first_track_stats,table_name )
+            Thread(target=self.start_saving).start()
 
             for track in self.albums_tracks_info:
                 track_stats = self.sp_requester.get_track_info(track['uri'])
-                self.db.add_records(track_stats) 
+                self.db.add_records(track_stats ) 
 
-        
+            self.db.create_sum_table()
 
-            self.db.close()
+
+
+            table_name = "SPotify"
+            column_to_retrieve = "Sauvage"
+            column_name = "duration_mins"
+            param_value = 4.69
+
+            query = self.db.retrieve_records(table_name, column_to_retrieve, column_name, param_value)
+            print(query)
+
+
+
         except AttributeError:
             #showerror("Błąd", "Wybierz album przed pobraniem danych do bazy")
             self.PopUpBox.show_custom_error_message(self.current_dir,"Błąd","Wybierz album przed pobraniem danych","error_icon" )

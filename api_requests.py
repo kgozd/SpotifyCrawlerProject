@@ -1,8 +1,7 @@
 from spotipy.oauth2 import SpotifyClientCredentials
 from spotipy import Spotify
 from json import dumps
-import asyncio
-import aiohttp
+
 
 class SpotifyAuthenticator:
     def __init__(self, client_id, client_secret):
