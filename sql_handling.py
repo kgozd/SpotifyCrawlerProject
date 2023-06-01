@@ -58,14 +58,14 @@ class Database:
         column_names = ", ".join(keys)
         return f"INSERT INTO {self.table_to_create} (ID, {column_names}) VALUES ({placeholders});"
 
-    def create_av_table(self):
+    def create_avarages_table(self):
         target_table = f"av_{self.table_to_create}"
         self.conn.execute(f"DROP TABLE IF EXISTS {target_table}")
 
         # Pobierz listę nazw kolumn z tabeli źródłowej
         column_names = list(self.record_dict.keys())
 
-        av_columns = [f"SUM({column}) / (SELECT COUNT(*) FROM {self.table_to_create}) AS {column}_av" for column in column_names]
+        av_columns = [f"SUM({column}) / (SELECT COUNT(*) FROM {self.table_to_create}) AS {column}" for column in column_names]
 
         # Tworzenie pustej tabeli
         create_table_query = f"CREATE TABLE {target_table} AS SELECT {', '.join(av_columns)} FROM {self.table_to_create}"

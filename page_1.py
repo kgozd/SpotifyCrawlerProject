@@ -41,7 +41,7 @@ class Page1(Page):
     def __init__(self, parent):
         super().__init__(parent, "Page 1")
         self.parent = parent
-        self.current_dir = dirname(__file__)
+        #self.current_dir = dirname(__file__)
         self.my_labels = Labele(self)
         self.PopUpBox = CustomMessage(self)
         self.db = Database()
@@ -77,9 +77,6 @@ class Page1(Page):
         self.progress = ttk.Progressbar(self, mode='determinate')
         
 
-
-
-
         self.artist_info_label = self.my_labels.create_label("Informacje o Artyście",   row=1, column=3, padx=(40, 20), pady=(5, 10), columnspan=5, sticky="new")
         self.artist_image_label = self.my_labels.create_label("Wybierz artystę",   row=2, column=3, padx=(40, 20), pady=(20, 10), sticky="nw")
         self.album_info_label = self.my_labels.create_label("Informacje o Albumie",   row=3, column=3, padx=(40, 20), pady=(10, 10), columnspan=5, sticky="new")
@@ -93,7 +90,8 @@ class Page1(Page):
 
        
         
-        self.albums_listbox = Listbox(self, font=("Arial", 12), width=40, height=15, bg="#2b2b2b", fg="white", cursor="hand2", selectbackground="#106a43",highlightbackground="#4ddf5d", highlightcolor="#4ddf5d", activestyle='none', justify=LEFT, selectmode=SINGLE,relief="flat", borderwidth=3)
+        self.albums_listbox = Listbox(self, font=("Arial", 12), width=40, height=15, bg="#2b2b2b", fg="white", cursor="hand2", selectbackground="#106a43",highlightbackground="#4ddf5d",
+                                      highlightcolor="#4ddf5d", activestyle='none', justify=LEFT, selectmode=SINGLE,relief="flat", borderwidth=3)
         self.albums_listbox.grid(row=2, column=1, padx=(20, 0), pady=(0, 0), sticky="nsew",rowspan=3)
         self.albums_listbox.grid_columnconfigure(0, weight=1)
 
@@ -108,7 +106,8 @@ class Page1(Page):
 
       
 
-        self.tracks_listbox = Listbox(self, font=("Arial", 12), width=40, height=15, bg="#2b2b2b", fg="white", cursor="hand2", selectbackground="#106a43",highlightbackground="#4ddf5d", highlightcolor="#4ddf5d", activestyle='none', justify=LEFT, selectmode=SINGLE,relief="flat", borderwidth=3)
+        self.tracks_listbox = Listbox(self, font=("Arial", 12), width=40, height=15, bg="#2b2b2b", fg="white", cursor="hand2", selectbackground="#106a43",highlightbackground="#4ddf5d",
+                                      highlightcolor="#4ddf5d", activestyle='none', justify=LEFT, selectmode=SINGLE,relief="flat", borderwidth=3)
         self.tracks_listbox.grid(row=8, column=1, padx=(20, 0), pady=(0, 0), sticky="nsew")
         self.tracks_listbox.grid_columnconfigure(0, weight=1)
 
@@ -124,15 +123,17 @@ class Page1(Page):
 
         self.button_clicked = BooleanVar()
         self.button_clicked.set(False)
+        self.press_enter = Entry(self)  # Utwórz obiekt Entry
+        self.press_enter.bind_all("<Return>", self.enter_artist_name)
+        #self.press_enter.focus_set()
         self.albums_listbox.bind("<<ListboxSelect>>", self.show_albums)
         self.tracks_listbox.bind("<<ListboxSelect>>", self.show_track_info)
-    
+        
    
    
     def enter_artist_name(self):
         try: 
-            artist_name = self.artist_entry.get()
-       
+            artist_name = self.artist_entry.get()       
 
             artist_id = self.sp_requester.get_artist_id(artist_name)
             self.artist_id = artist_id
@@ -186,7 +187,7 @@ class Page1(Page):
             selected_album = [album for album in self.albums if album['name'] == selected_album_name][0]
             album_id = selected_album['uri']
             self.album_id = album_id
-            print(self.album_id)
+            # print(self.album_id)
             #self.print_track_info(track_info)
             #self.sp_analyzer.display_tracks(tracks) 
             self.insert_tracks_to_listbox() 
@@ -256,7 +257,7 @@ class Page1(Page):
         
             first_track_stats = self.sp_requester.get_track_info(first_track_uri)
         
-            db_path = join(self.current_dir, 'baza_danych.db')
+            db_path = join(self.current_dir, 'scdb.db')
             self.db.connect(db_path)
             table_name = "SPotify"
             self.db.create_table(first_track_stats,table_name )
@@ -266,17 +267,17 @@ class Page1(Page):
                 track_stats = self.sp_requester.get_track_info(track['uri'])
                 self.db.add_records(track_stats ) 
 
-            self.db.create_sum_table()
+            self.db.create_avarages_table()
 
 
 
-            table_name = "SPotify"
-            column_to_retrieve = "Sauvage"
-            column_name = "duration_mins"
-            param_value = 4.69
+            # table_name = "SPotify"
+            # column_to_retrieve = "duration_mins"
+            # column_name = "NAME"
+            # param_value = "SAUVAGE"
 
-            query = self.db.retrieve_records(table_name, column_to_retrieve, column_name, param_value)
-            print(query)
+            # query = self.db.retrieve_records(table_name, column_to_retrieve, column_name, param_value)
+            # print(query)
 
 
 
@@ -284,12 +285,12 @@ class Page1(Page):
             #showerror("Błąd", "Wybierz album przed pobraniem danych do bazy")
             self.PopUpBox.show_custom_error_message(self.current_dir,"Błąd","Wybierz album przed pobraniem danych","error_icon" )
 
-    def track_selection(self, event):
-        selected_track_index = self.tracks_listbox.curselection()[0]
-        selected_track_name = self.tracks_listbox.get(selected_track_index)
-        tracks = self.sp_requester.get_tracks_from_album(self.selected_album['uri'])
-        selected_track = [track for track in tracks if track['name'] == selected_track_name][0]
-        self.show_track_info(selected_track)
+    # def track_selection(self, event):
+    #     selected_track_index = self.tracks_listbox.curselection()[0]
+    #     selected_track_name = self.tracks_listbox.get(selected_track_index)
+    #     tracks = self.sp_requester.get_tracks_from_album(self.selected_album['uri'])
+    #     selected_track = [track for track in tracks if track['name'] == selected_track_name][0]
+    #     self.show_track_info(selected_track)
        
 
     def show_track_info(self, event):

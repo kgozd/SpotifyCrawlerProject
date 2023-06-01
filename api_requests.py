@@ -63,6 +63,7 @@ class SpotifyRequester:
     
     def get_tracks_from_album(self, album_uri):
         tracks = []
+        self.album_uri = album_uri
         results = self.sp.album_tracks(album_uri)
         tracks.extend(results['items'])
         while results['next']:
@@ -75,10 +76,11 @@ class SpotifyRequester:
         track = self.sp.track(track_uri)
         audio_features = self.sp.audio_features(track_uri)[0]
         dict = ({
-            'track_uri': track_uri,
-            'album_name': track['album']['name'], # nazwa albumu, na którym jest utwór
-            'album_release_date': track['album']['release_date'], # data wydania albumu
             'artist_name': track['artists'][0]['name'], # nazwa pierwszego wykonawcy utworu
+            'album_name': track['album']['name'], # nazwa albumu, na którym jest utwór
+            'album_uri': self.album_uri,
+            'album_release_date': track['album']['release_date'], # data wydania albumu
+            'track_uri': track_uri,
             'name': track['name'], 
             'duration_mins': round(track['duration_ms']/60000,2),
             'popularity': track['popularity'],

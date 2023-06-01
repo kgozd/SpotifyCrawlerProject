@@ -6,6 +6,7 @@ schemat_plików_projekt_POC.vsdx
 sqllitedb/baza_danych.db
 test_sqllite.py
 baza_danych.db
+scdb.db
 #Pictures/sc_icon.ico
 #Pictures/sc_icon.png
 

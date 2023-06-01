@@ -20,38 +20,6 @@ from urllib.request import urlopen
  
 
 
-"""
-
-    def insert_tracks_list_to_widget(self, tracks):
-        self.textbox.delete('1.0', END)
-
-       # for track in tracks:
-        #    self.textbox.insert(END, track["name"]+ "\n") # wstaw tekst do panelu pierwszej zakładki
-     
-        for i, track in enumerate(tracks):
-            time_in_minutes = round(track['duration_ms']/60000,2)
-            #print(f"{i + 1}. {track['name']} ({time_in_minutes} min)")
-            self.textbox.insert(END, f"{i + 1}. {track['name']} ({time_in_minutes} min)"+ "\n") # wstaw tekst do panelu pierwszej zakładki
-
-    def print_all_tracks(self, tracks):
-        utwory = self.sp_analyzer.display_tracks( tracks)
-        print(utwory)
-
-    def print_all_tracks(self, track_info):
-        self.albums_listbox.delete(0, END)
-        for track in track_info:
-            self.albums_listbox.insert(END, track['name'])
-    
-    def get_tracks_from_album(self, album_uri):
-        track_info = self.sp_analyzer.get_tracks_from_album(album_uri)
-        self.albums_listbox.delete(0, END)
-        for track in track_info:
-            self.albums_listbox.insert(END, track['name'])
-
-    def print_track_info(self, track_info):
-       print(track_info)
-"""
-
     
 
 
@@ -82,9 +50,13 @@ class MainView(Frame):
     def create_sidebar(self):
         self.sidebar = Frame(self, bg='#2b2b2b', width=150)
         self.sidebar.pack(side='left', fill='y')
+
+        app_title = Label(self.sidebar, text="Spotify Crawler", font=("Arial", 16, 'bold'), fg='#4ddf5d', bg='#2b2b2b')
+        app_title.pack(side='top', pady=(20,10), padx=10)
+
         page_names = ['Page1', 'Page2', 'Page3']
         for name in page_names:
-            button = CTkButton(self.sidebar, text=name, height=50, width= 150,text_color="#000000",fg_color="#4ddf5d", font=("Arial", 15, 'bold'), command=lambda name=name: self.show_page(name), hover_color="#3bac47")
+            button = CTkButton(self.sidebar, text=name, height=50, width=150, text_color="#000000", fg_color="#4ddf5d", font=("Arial", 18, 'bold'), command=lambda name=name: self.show_page(name), hover_color="#3bac47")
             button.pack(side='top', pady=10, padx=10)
 
     def create_page_container(self):
@@ -101,5 +73,6 @@ class MainView(Frame):
         elif page_name == "Page3":
             self.current_page = Page3(self.page_container)
         self.current_page.pack(side='top', fill='both', expand=True)
+
 
        

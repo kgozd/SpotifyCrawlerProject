@@ -161,6 +161,8 @@ class Page(Frame):
         self.name = name
         self.sp_authenticator = SpotifyAuthenticator(client_id, client_secret) # Replace client_id and client_secret with your own Spotify API credentials
         self.sp_requester = SpotifyRequester(self.sp_authenticator.get_spotify_instance())
+        self.current_dir = dirname(__file__)
+
         set_appearance_mode("system")
         set_default_color_theme("green")
 
