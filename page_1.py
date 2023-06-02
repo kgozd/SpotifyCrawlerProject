@@ -87,7 +87,17 @@ class Page1(Page):
         self.db_saving_label= self.my_labels.create_label("",   row=0, column=8, padx=(20, 20), pady=(5, 5))
 
 
-
+   
+        # self.play_button = CTkButton(self, text="Play", font=("Arial", 8, "bold"),
+        #                              height=20, fg_color="#4ddf5d", text_color="#000000", hover_color="#3bac47")
+        # self.play_button.grid(row=8, column=3, padx=(2, 0), pady=(1, 5), sticky="nsew")
+        
+        # self.stop_button = CTkButton(self, text="Stop", font=("Arial", 8, "bold"),
+        #                              height=20, fg_color="#4ddf5d", text_color="#000000", hover_color="#3bac47")
+        # self.stop_button.grid(row=9, column=3, padx=(2, 0), pady=(1, 5), sticky="nsew")
+        
+        
+        #self.initialize_pygame()
        
         
         self.albums_listbox = Listbox(self, font=("Arial", 12), width=40, height=15, bg="#2b2b2b", fg="white", cursor="hand2", selectbackground="#106a43",highlightbackground="#4ddf5d",
