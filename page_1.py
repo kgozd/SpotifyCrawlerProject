@@ -25,6 +25,7 @@ from threading import Thread
 from  tkinter.messagebox import showerror
 from time import sleep
 from concurrent.futures import ThreadPoolExecutor
+from cachetools import cached, LRUCache
 
 
 
@@ -37,12 +38,13 @@ from concurrent.futures import ThreadPoolExecutor
 
 
 class Page1(Page):
-    
+    cache = LRUCache(maxsize=100) 
     def __init__(self, parent):
         super().__init__(parent, "Page 1")
         self.parent = parent
         #self.current_dir = dirname(__file__)
-        self.my_labels = Labele(self)
+        self.my_labels1 = Labele(self)
+        
         self.PopUpBox = CustomMessage(self)
         self.db = Database()
         self.artist_stats_widget1 = None
@@ -50,53 +52,68 @@ class Page1(Page):
         self.albums_stats_widget1 = None
         self.tracks_stats_widget1 = None
         self.create_widgets()
-
+         # Utworzenie pamięci podręcznej TTLCache
+        
         
 
         
     def create_widgets(self):            
+        self.listboxes_frame = CTkFrame(self, bg_color='#242424',fg_color="#242424", corner_radius=5, height = 20)
+        self.listboxes_frame.grid(row=0, column=1, rowspan=8, padx=(20, 20), pady=(10,0))
 
-        self.artist_entry = CTkEntry(self,font=("Arial", 18), height=40, width=50,  placeholder_text="Wpisz Nazwę Artysty")
+        self.artist_entry = CTkEntry(self.listboxes_frame,font=("Arial", 18), height=40,  placeholder_text="Wpisz Nazwę Artysty", fg_color="#2b2b2b", placeholder_text_color="#f0f0f0", text_color="white")
         self.artist_entry.grid(row=0, column=1,  padx=(25, 0), pady=(15, 5),  sticky="nsew")
         self.artist_entry.grid_columnconfigure(0, weight=1)  # configure grid of individual tabs
 
-            
-        self.button_to_request = CTkButton(self, text="Pobierz dane ",font=("Arial", 18,'bold'), height=40,fg_color="#4ddf5d",
+        self.buttons_frame = CTkFrame(self, bg_color='#242424',fg_color="#242424", corner_radius=5, height = 20)
+        self.buttons_frame.grid(row=0, column=3, columnspan=2, padx=(20, 20))
+
+
+        self.button_to_request = CTkButton(self.buttons_frame, text="Pobierz dane ",font=("Arial", 18,'bold'), height=40, width =20 ,fg_color="#4ddf5d",
                                            text_color="#000000", command=self.enter_artist_name,  hover_color="#3bac47")
-        self.button_to_request.grid(row=0, column=3, padx=(20, 0), pady=(15, 5), sticky="nsew", columnspan=1)
+        self.button_to_request.grid(row=0, column=3, padx=(20, 0), pady=(0, 5), sticky="nswe", columnspan=1)
         self.button_to_request.grid_columnconfigure(0, weight=1) 
 
         
 
-        self.button_to_save_to_db = CTkButton(self, text="Zapisz do bazy",font=("Arial", 18,'bold'), height=40,fg_color="#4ddf5d",
+        self.button_to_save_to_db = CTkButton(self.buttons_frame, text="Zapisz do bazy",font=("Arial", 18,'bold'), height=40, width =20, fg_color="#4ddf5d",
                                            text_color="#000000", command=self.run_in_thread_create_db,  hover_color="#3bac47", text_color_disabled= "#111111")
-        self.button_to_save_to_db.grid(row=0, column=4, padx=(20, 0), pady=(15, 5),sticky="nsew", columnspan=1)
+        self.button_to_save_to_db.grid(row=0, column=4, padx=(20, 0), pady=(0, 5),sticky="nesw", columnspan=1)
         self.button_to_save_to_db.grid_columnconfigure(0, weight=1)
        
 
-        self.progress = ttk.Progressbar(self, mode='determinate')
-        
+        self.progress = ttk.Progressbar(self.buttons_frame, mode='determinate')
 
-        self.artist_info_label = self.my_labels.create_label("Informacje o Artyście",   row=1, column=3, padx=(40, 20), pady=(5, 10), columnspan=5, sticky="new")
-        self.artist_image_label = self.my_labels.create_label("Wybierz artystę",   row=2, column=3, padx=(40, 20), pady=(20, 10), sticky="nw")
-        self.album_info_label = self.my_labels.create_label("Informacje o Albumie",   row=3, column=3, padx=(40, 20), pady=(10, 10), columnspan=5, sticky="new")
-        self.album_cover_label = self.my_labels.create_label("Wybierz album",   row=4, column=3, padx=(40, 20), pady=(10, 10), columnspan=1, sticky="nw")
-        self.tracks_info_label = self.my_labels.create_label("Informacje o Utworze",   row=7, column=3, padx=(40, 20), pady=(5, 5), columnspan=5, sticky="nsew")
-        self.albums_listbox_label = self.my_labels.create_label("Albumy",   row=1, column=1, padx=(20, 20), pady=(5, 5))
-        self.tracks_listbox_label = self.my_labels.create_label("Utwory",   row=7, column=1, padx=(20, 20), pady=(5, 5))
-        self.db_saving_label= self.my_labels.create_label("",   row=0, column=8, padx=(20, 20), pady=(5, 5))
+      
 
+        self.artist_info_label = self.my_labels1.create_label("Informacje o Artyście",   row=1, column=3, padx=(40, 20), pady=(5, 10), columnspan=3, sticky="new")
+        self.artist_image_label = self.my_labels1.create_label("",   row=2, column=3, padx=(40, 20), pady=(5, 10), sticky="nw")
+        self.album_info_label = self.my_labels1.create_label("Informacje o Albumie",   row=3, column=3, padx=(40, 20), pady=(5, 10), columnspan=3, sticky="new")
+        self.album_cover_label = self.my_labels1.create_label("",   row=4, column=3, padx=(40, 20), pady=(5, 10), columnspan=1, sticky="nw")
+        self.tracks_info_label = self.my_labels1.create_label("Informacje o Utworze",   row=4, column=4, padx=(40, 20), pady=(5, 5), columnspan=3, sticky="nsew")
+        #self.albums_listbox_label = self.my_labels2.create_label( self.listboxes_frame,"Albumy",   row=1, column=1, padx=(20, 20), pady=(5, 5))
+        #self.tracks_listbox_label = self.my_labels2.create_label( self.listboxes_frame,"Utwory",   row=7, column=1, padx=(20, 20), pady=(5, 5))
+        self.db_saving_label= self.my_labels1.create_label("",   row=4, column=8, padx=(20, 20), pady=(5, 5))
 
+        self.track_stats_frame = CTkFrame(self, bg_color='#242424',fg_color="#242424", corner_radius=5)
+        self.track_stats_frame.grid(row=5, column=3, columnspan=3, padx=(20, 20))
 
        
         
-        self.albums_listbox = Listbox(self, font=("Arial", 12), width=40, height=15, bg="#2b2b2b", fg="white", cursor="hand2", selectbackground="#106a43",highlightbackground="#4ddf5d",
+        
+        
+        self.albums_listbox_label = CTkLabel(self.listboxes_frame,text= "Albumy", font=("Arial", 20, 'bold'),  text_color="#f0f0f0"     )
+        self.albums_listbox_label.grid(row=1, column=1, padx=(0, 0), pady=(0, 0), columnspan=1,sticky="nsew")        
+        
+       
+        
+        self.albums_listbox = Listbox(self.listboxes_frame, font=("Arial", 12), width=40, height=15, bg="#2b2b2b", fg="white", cursor="hand2", selectbackground="#106a43",highlightbackground="#4ddf5d",
                                       highlightcolor="#4ddf5d", activestyle='none', justify=LEFT, selectmode=SINGLE,relief="flat", borderwidth=3)
-        self.albums_listbox.grid(row=2, column=1, padx=(20, 0), pady=(0, 0), sticky="nsew",rowspan=3)
+        self.albums_listbox.grid(row=3, column=1, padx=(20, 0), pady=(0, 0), sticky="nsew",rowspan=1)
         self.albums_listbox.grid_columnconfigure(0, weight=1)
 
-        scrollbar_frame = Frame(self)
-        scrollbar_frame.grid(row=2, column=2, padx=(0, 0), pady=(0, 0), sticky="ns",rowspan=4)
+        scrollbar_frame = Frame(self.listboxes_frame)
+        scrollbar_frame.grid(row=3, column=2, padx=(0, 0), pady=(0, 0), sticky="ns",rowspan=1)
         scrollbar_style = ttk.Style()
         scrollbar_style.configure("Custom.Vertical.TScrollbar", troughcolor="#2b2b2b", background="#106a43", gripcount=0, gripmargin=0, gripstyle="n", width=20)
         scrollbar_albums = ttk.Scrollbar(scrollbar_frame, orient=VERTICAL, command=self.albums_listbox.yview, style="Custom.Vertical.TScrollbar")
@@ -104,14 +121,16 @@ class Page1(Page):
         self.albums_listbox.configure(yscrollcommand=scrollbar_albums.set)
 
 
-      
+        self.tracks_listbox_label = CTkLabel(self.listboxes_frame,text= "Utwory", font=("Arial", 20, 'bold'),  text_color="#f0f0f0"     )
+        self.tracks_listbox_label.grid(row=4, column=1, padx=(0, 0), pady=(0, 0), columnspan=1,sticky="nsew")  
+        
 
-        self.tracks_listbox = Listbox(self, font=("Arial", 12), width=40, height=15, bg="#2b2b2b", fg="white", cursor="hand2", selectbackground="#106a43",highlightbackground="#4ddf5d",
+        self.tracks_listbox = Listbox(self.listboxes_frame, font=("Arial", 12), width=40, height=15, bg="#2b2b2b", fg="white", cursor="hand2", selectbackground="#106a43",highlightbackground="#4ddf5d",
                                       highlightcolor="#4ddf5d", activestyle='none', justify=LEFT, selectmode=SINGLE,relief="flat", borderwidth=3)
         self.tracks_listbox.grid(row=8, column=1, padx=(20, 0), pady=(0, 0), sticky="nsew")
         self.tracks_listbox.grid_columnconfigure(0, weight=1)
 
-        scrollbar_frame = Frame(self)
+        scrollbar_frame = Frame(self.listboxes_frame)
         scrollbar_frame.grid(row=8, column=2, padx=(0, 0), pady=(0, 0), sticky="ns")
         scrollbar_style = ttk.Style()
         scrollbar_style.configure("Custom.Vertical.TScrollbar", troughcolor="#2b2b2b", background="#106a43", gripcount=0, gripmargin=0, gripstyle="n", width=20)
@@ -229,7 +248,7 @@ class Page1(Page):
     def start_saving(self):
         self.button_to_save_to_db.configure(state="disabled")  
         
-        self.progress.grid(row=0, column=6, columnspan=1, padx=10, pady=10)  
+        self.progress.grid(row=0, column=5, columnspan=1, padx=10, pady=10)  
 
 
         self.button_to_save_to_db.configure(text="Trwa zapisywanie...")   
@@ -316,8 +335,8 @@ class Page1(Page):
                 self.tracks_stats_widget1.clear_list()
                 self.tracks_stats_widget2.clear_list()
             else:
-                self.tracks_stats_widget1 = ListWithItems(self)
-                self.tracks_stats_widget2 = ListWithItems(self)
+                self.tracks_stats_widget1 = ListWithItems(self.track_stats_frame)
+                self.tracks_stats_widget2 = ListWithItems(self.track_stats_frame)
             self.tracks_stats_widget1.grid(row=8, column=4,padx=(5,5), pady=(10, 10),columnspan=1,sticky="nw")
             self.tracks_stats_widget2.grid(row=8, column=5,padx=(5,5), pady=(10, 10),columnspan=1,sticky="nw")
 

@@ -1,5 +1,5 @@
 #my libraries
-from page import Page, Labele
+from page import Page, Labele, CustomMessage
 from sql_handling import Database
 #additional libraries
 from tkinter import(
@@ -71,6 +71,7 @@ class Page2(Page):
         super().__init__(parent,"Page 2")
         self.parent = parent
         self.db_path = join(self.current_dir, 'scdb.db')
+        self.PopUpBox = CustomMessage(self)
 
         self.my_labels = Labele(self)
         self.plot1 = Wykres()
@@ -81,7 +82,6 @@ class Page2(Page):
         
         self.db.connect(self.db_path)
         query = self.db.retrieve_records("SPotify", "album_name", "available_markets", "brak_wartości")
-        print(query)
         self.db.close()
 
         self.title= self.my_labels.create_label(f"Wykresy dla albumu: {query}",   row=0, column=1, padx=(20, 20), pady=(5, 5), columnspan = 5)
@@ -94,7 +94,7 @@ class Page2(Page):
         self.tracks_listbox.grid_columnconfigure(0, weight=1)
 
         scrollbar_frame = Frame(self)
-        scrollbar_frame.grid(row=1, column=2, padx=(0, 0), pady=(0, 0), sticky="ns")
+        scrollbar_frame.grid(row=1, column=2, padx=(0, 0), pady=(0, 0), sticky="wns")
         scrollbar_style = ttk.Style()
         scrollbar_style.configure("Custom.Vertical.TScrollbar", troughcolor="#2b2b2b", background="#106a43", gripcount=0, gripmargin=0, gripstyle="n", width=20)
         scrollbar_tracks = ttk.Scrollbar(scrollbar_frame, orient=VERTICAL, command=self.tracks_listbox.yview, style="Custom.Vertical.TScrollbar")
@@ -121,7 +121,7 @@ class Page2(Page):
         self.optionmenu = CTkOptionMenu(self, dynamic_resizing=True,
                                         values=list(self.value_dict.keys()), variable=self.selected_key,
                                         command=self.handle_optionmenu_selection, font=("Arial", 17,'bold'), height=40,fg_color="#4ddf5d",
-                                           text_color="#000000" ,  text_color_disabled= "#111111",dropdown_font=("Arial", 14,'bold'),dropdown_text_color="white",button_color="#4ddf5d",button_hover_color="#3bac47")
+                                           text_color="#000000" ,  text_color_disabled= "#111111",dropdown_font=("Arial", 14,'bold'),dropdown_text_color="white",button_color="#4ddf5d",button_hover_color="#3bac47",dropdown_fg_color="#2b2b2b")
         self.optionmenu.grid(row=0, column=0, padx=20, pady=(20, 10))
 
         canvas = FigureCanvasTkAgg(self.plot1.fig, master=self)
@@ -139,12 +139,14 @@ class Page2(Page):
             self.tracks_listbox.insert(END, row[0])
     
     def track_selection(self, event):
-        self.conn = connect(self.db_path)
-        self.selected_track_index = self.tracks_listbox.curselection()[0]
-        self.selected_track_name = self.tracks_listbox.get(self.selected_track_index)
-        print( self.selected_track_name)
-        self.set_plot_values()
-        self.conn.close()
+        try:
+            self.conn = connect(self.db_path)
+            self.selected_track_index = self.tracks_listbox.curselection()[0]
+            self.selected_track_name = self.tracks_listbox.get(self.selected_track_index)
+            self.set_plot_values()
+            self.conn.close()
+        except IndexError:
+            pass
     def handle_optionmenu_selection(self, selected_key):
         self.selected_value.set(self.value_dict[selected_key])
         
@@ -156,8 +158,10 @@ class Page2(Page):
                                   command=self.plot1.zapisz_do_pliku, font=("Arial", 15,'bold'), height=30,
                                            text_color="#000000",  hover_color="#3bac47")
         button_zapisz.grid(row=2, column=3, padx=10, pady=10)
-
-        self.set_plot_values()
+        try:
+            self.set_plot_values()
+        except AttributeError:
+            self.PopUpBox.show_custom_error_message(self.current_dir,"Błąd","Najpierw wybierz utwór!","warning_icon" )
 
 
     def set_plot_values(self):
@@ -167,14 +171,17 @@ class Page2(Page):
             
             query_1 = self.db.retrieve_records("SPotify", self.selected_value.get(), "name", self.selected_track_name)
             query_2 = self.db.retrieve_records("av_SPotify", self.selected_value.get(), "track_uri", 0)
-            percent= abs((float(query_1) - float(query_2))*100)
+            
+            percent= abs(((float(query_1) - float(query_2))/float(query_2))*100)
             percent = "{:.2f}".format(percent)
-            if float(query_1) > float(query_2):
+            if self.title is not None:
+                self.title.destroy()
+            if float(query_1) < float(query_2):
                 
-                self.title= self.my_labels.create_label(f" {self.selected_key.get()} w utworze  jest o {percent}% mniejsza niż średnia dla albumu",
+                self.title= self.my_labels.create_label(f" {self.selected_key.get()} w tym utworze jest o {percent}% mniejsza niż średnia dla albumu",
                                                         row=5, column=2, padx=(20, 20), pady=(5, 5), columnspan = 5) 
             else:
-                self.title= self.my_labels.create_label(f"{self.selected_key.get()} w utworze  jest o {percent}% większa niż średnia dla albumu",
+                self.title= self.my_labels.create_label(f"{self.selected_key.get()} w tym utworze jest o {percent}% większa niż średnia dla albumu",
                                                                                      row=5, column=2, padx=(20, 20), pady=(5, 5), columnspan = 5)                                                                                                                                             
 
 
