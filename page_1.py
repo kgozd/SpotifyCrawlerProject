@@ -3,125 +3,117 @@ from page import Page, Labele,ListWithItems, CustomMessage
 from sql_handling import Database
 #additional libraries
 from tkinter import(
-    Frame, Label, Button, Tk, 
-    Entry, Listbox, Canvas, END, 
-    BooleanVar, Scrollbar, ttk, VERTICAL, 
-     SINGLE, Y,LEFT, RIGHT, CENTER
+    Frame, Entry, Listbox,  END, 
+    BooleanVar,  ttk, VERTICAL, 
+     SINGLE, Y,LEFT, RIGHT
 ) 
 from customtkinter import(
-    CTkScrollbar, CTkTabview, CTkButton, CTkEntry,
-    CTkScrollableFrame,
-    CTkTextbox, CTkLabel, CTkFont, CTkImage,CTkFrame,CTk
+     CTkButton, CTkEntry,
+     CTkLabel,  CTkImage,CTkFrame
 )  
  
 from io import BytesIO
-from PIL import ImageTk, Image, ImageDraw
+from PIL import  Image
 from urllib.request import urlopen
-from functools import partial
-from os import getcwd
-from os.path import dirname, join, abspath
+from os.path import  join
 from spotipy.exceptions import SpotifyException
 from threading import Thread
-from  tkinter.messagebox import showerror
 from time import sleep
-from concurrent.futures import ThreadPoolExecutor
-
-
-
-
-
-    
-
 
 
 
 
 class Page1(Page):
-    
+  
     def __init__(self, parent):
         super().__init__(parent, "Page 1")
         self.parent = parent
-        #self.current_dir = dirname(__file__)
-        self.my_labels = Labele(self)
+        self.my_labels1 = Labele(self)
+        
         self.PopUpBox = CustomMessage(self)
         self.db = Database()
+        self.db_path = join(self.current_dir, 'scdb.db')
+        self.db.remove_db(self.db_path)
         self.artist_stats_widget1 = None
         self.artist_stats_widget2 = None
         self.albums_stats_widget1 = None
         self.tracks_stats_widget1 = None
         self.create_widgets()
-
+        
         
 
         
     def create_widgets(self):            
+        self.listboxes_frame = CTkFrame(self, bg_color='#242424',fg_color="#242424", corner_radius=5, height = 20)
+        self.listboxes_frame.grid(row=0, column=1, rowspan=8, padx=(20, 20), pady=(10,0))
 
-        self.artist_entry = CTkEntry(self,font=("Arial", 18), height=40, width=50,  placeholder_text="Wpisz Nazwę Artysty")
+        self.artist_entry = CTkEntry(self.listboxes_frame,font=("Arial", 18), height=40,  placeholder_text="Wpisz Nazwę Artysty", fg_color="#2b2b2b", placeholder_text_color="#f0f0f0", text_color="white")
         self.artist_entry.grid(row=0, column=1,  padx=(25, 0), pady=(15, 5),  sticky="nsew")
-        self.artist_entry.grid_columnconfigure(0, weight=1)  # configure grid of individual tabs
+        self.artist_entry.grid_columnconfigure(0, weight=1)  
 
-            
-        self.button_to_request = CTkButton(self, text="Pobierz dane ",font=("Arial", 18,'bold'), height=40,fg_color="#4ddf5d",
+        self.buttons_frame = CTkFrame(self, bg_color='#242424',fg_color="#242424", corner_radius=5, height = 20)
+        self.buttons_frame.grid(row=0, column=3, columnspan=2, padx=(20, 20))
+
+
+        self.button_to_request = CTkButton(self.buttons_frame, text="Pobierz dane ",font=("Arial", 18,'bold'), height=40, width =20 ,fg_color="#4ddf5d",
                                            text_color="#000000", command=self.enter_artist_name,  hover_color="#3bac47")
-        self.button_to_request.grid(row=0, column=3, padx=(20, 0), pady=(15, 5), sticky="nsew", columnspan=1)
+        self.button_to_request.grid(row=0, column=3, padx=(20, 0), pady=(10, 5), sticky="nswe", columnspan=1)
         self.button_to_request.grid_columnconfigure(0, weight=1) 
 
         
 
-        self.button_to_save_to_db = CTkButton(self, text="Zapisz do bazy",font=("Arial", 18,'bold'), height=40,fg_color="#4ddf5d",
+        self.button_to_save_to_db = CTkButton(self.buttons_frame, text="Zapisz do bazy",font=("Arial", 18,'bold'), height=40, width =20, fg_color="#4ddf5d",
                                            text_color="#000000", command=self.run_in_thread_create_db,  hover_color="#3bac47", text_color_disabled= "#111111")
-        self.button_to_save_to_db.grid(row=0, column=4, padx=(20, 0), pady=(15, 5),sticky="nsew", columnspan=1)
+        self.button_to_save_to_db.grid(row=0, column=4, padx=(20, 0), pady=(10, 5),sticky="nesw", columnspan=1)
         self.button_to_save_to_db.grid_columnconfigure(0, weight=1)
        
 
-        self.progress = ttk.Progressbar(self, mode='determinate')
-        
+        self.progress = ttk.Progressbar(self.buttons_frame, mode='determinate')
 
-        self.artist_info_label = self.my_labels.create_label("Informacje o Artyście",   row=1, column=3, padx=(40, 20), pady=(5, 10), columnspan=5, sticky="new")
-        self.artist_image_label = self.my_labels.create_label("Wybierz artystę",   row=2, column=3, padx=(40, 20), pady=(20, 10), sticky="nw")
-        self.album_info_label = self.my_labels.create_label("Informacje o Albumie",   row=3, column=3, padx=(40, 20), pady=(10, 10), columnspan=5, sticky="new")
-        self.album_cover_label = self.my_labels.create_label("Wybierz album",   row=4, column=3, padx=(40, 20), pady=(10, 10), columnspan=1, sticky="nw")
-        self.tracks_info_label = self.my_labels.create_label("Informacje o Utworze",   row=7, column=3, padx=(40, 20), pady=(5, 5), columnspan=5, sticky="nsew")
-        self.albums_listbox_label = self.my_labels.create_label("Albumy",   row=1, column=1, padx=(20, 20), pady=(5, 5))
-        self.tracks_listbox_label = self.my_labels.create_label("Utwory",   row=7, column=1, padx=(20, 20), pady=(5, 5))
-        self.db_saving_label= self.my_labels.create_label("",   row=0, column=8, padx=(20, 20), pady=(5, 5))
+      
 
-
-   
-        # self.play_button = CTkButton(self, text="Play", font=("Arial", 8, "bold"),
-        #                              height=20, fg_color="#4ddf5d", text_color="#000000", hover_color="#3bac47")
-        # self.play_button.grid(row=8, column=3, padx=(2, 0), pady=(1, 5), sticky="nsew")
-        
-        # self.stop_button = CTkButton(self, text="Stop", font=("Arial", 8, "bold"),
-        #                              height=20, fg_color="#4ddf5d", text_color="#000000", hover_color="#3bac47")
-        # self.stop_button.grid(row=9, column=3, padx=(2, 0), pady=(1, 5), sticky="nsew")
-        
-        
-        #self.initialize_pygame()
+        self.artist_info_label = self.my_labels1.create_label("Informacje o Artyście",   row=1, column=3, padx=(40, 20), pady=(5, 10), columnspan=3, sticky="new")
+        self.artist_image_label = self.my_labels1.create_label("",   row=2, column=3, padx=(40, 20), pady=(5, 10), sticky="nw")
+        self.album_info_label = self.my_labels1.create_label("Informacje o Albumie",   row=3, column=3, padx=(40, 20), pady=(5, 10), columnspan=3, sticky="new")
+        self.album_cover_label = self.my_labels1.create_label("",   row=4, column=3, padx=(40, 20), pady=(5, 10), columnspan=1, sticky="nw")
+        self.tracks_info_label = self.my_labels1.create_label("Informacje o Utworze",   row=5, column=3, padx=(40, 20), pady=(5, 5), columnspan=3, sticky="nsew")
        
+        self.db_saving_label= self.my_labels1.create_label("",   row=4, column=8, padx=(20, 20), pady=(5, 5))
+
+
+       
+        self.track_stats_frame = CTkFrame(self, bg_color='#242424',fg_color="#242424", corner_radius=5)
+        self.track_stats_frame.grid(row=6, column=3, columnspan=3, padx=(20, 20))
+
+
+        self.albums_listbox_label = CTkLabel(self.listboxes_frame,text= "Albumy", font=("Arial", 20, 'bold'),  text_color="#f0f0f0"     )
+        self.albums_listbox_label.grid(row=1, column=1, padx=(0, 0), pady=(0, 0), columnspan=1,sticky="nsew")        
         
-        self.albums_listbox = Listbox(self, font=("Arial", 12), width=40, height=15, bg="#2b2b2b", fg="white", cursor="hand2", selectbackground="#106a43",highlightbackground="#4ddf5d",
+
+        
+        self.albums_listbox = Listbox(self.listboxes_frame, font=("Arial", 13), width=40, height=8, bg="#2b2b2b", fg="white", cursor="hand2", selectbackground="#106a43",highlightbackground="#4ddf5d",
                                       highlightcolor="#4ddf5d", activestyle='none', justify=LEFT, selectmode=SINGLE,relief="flat", borderwidth=3)
-        self.albums_listbox.grid(row=2, column=1, padx=(20, 0), pady=(0, 0), sticky="nsew",rowspan=3)
+        self.albums_listbox.grid(row=3, column=1, padx=(20, 0), pady=(0, 0), sticky="nsew",rowspan=1)
         self.albums_listbox.grid_columnconfigure(0, weight=1)
 
-        scrollbar_frame = Frame(self)
-        scrollbar_frame.grid(row=2, column=2, padx=(0, 0), pady=(0, 0), sticky="ns",rowspan=4)
+        scrollbar_frame = Frame(self.listboxes_frame)
+        scrollbar_frame.grid(row=3, column=2, padx=(0, 0), pady=(0, 0), sticky="ns",rowspan=1)
         scrollbar_style = ttk.Style()
         scrollbar_style.configure("Custom.Vertical.TScrollbar", troughcolor="#2b2b2b", background="#106a43", gripcount=0, gripmargin=0, gripstyle="n", width=20)
         scrollbar_albums = ttk.Scrollbar(scrollbar_frame, orient=VERTICAL, command=self.albums_listbox.yview, style="Custom.Vertical.TScrollbar")
         scrollbar_albums.pack(fill=Y, side=LEFT)
         self.albums_listbox.configure(yscrollcommand=scrollbar_albums.set)
 
+        self.tracks_listbox_label = CTkLabel(self.listboxes_frame,text= "Utwory", font=("Arial", 20, 'bold'),  text_color="#f0f0f0"     )
+        self.tracks_listbox_label.grid(row=4, column=1, padx=(5, 5), pady=(0, 0), columnspan=1,sticky="nsew")  
+        
 
-      
-
-        self.tracks_listbox = Listbox(self, font=("Arial", 12), width=40, height=15, bg="#2b2b2b", fg="white", cursor="hand2", selectbackground="#106a43",highlightbackground="#4ddf5d",
+        self.tracks_listbox = Listbox(self.listboxes_frame, font=("Arial", 13), width=40, height=20, bg="#2b2b2b", fg="white", cursor="hand2", selectbackground="#106a43",highlightbackground="#4ddf5d",
                                       highlightcolor="#4ddf5d", activestyle='none', justify=LEFT, selectmode=SINGLE,relief="flat", borderwidth=3)
         self.tracks_listbox.grid(row=8, column=1, padx=(20, 0), pady=(0, 0), sticky="nsew")
         self.tracks_listbox.grid_columnconfigure(0, weight=1)
 
-        scrollbar_frame = Frame(self)
+        scrollbar_frame = Frame(self.listboxes_frame)
         scrollbar_frame.grid(row=8, column=2, padx=(0, 0), pady=(0, 0), sticky="ns")
         scrollbar_style = ttk.Style()
         scrollbar_style.configure("Custom.Vertical.TScrollbar", troughcolor="#2b2b2b", background="#106a43", gripcount=0, gripmargin=0, gripstyle="n", width=20)
@@ -133,15 +125,14 @@ class Page1(Page):
 
         self.button_clicked = BooleanVar()
         self.button_clicked.set(False)
-        self.press_enter = Entry(self)  # Utwórz obiekt Entry
+        self.press_enter = Entry(self)  
         self.press_enter.bind_all("<Return>", self.enter_artist_name)
-        #self.press_enter.focus_set()
         self.albums_listbox.bind("<<ListboxSelect>>", self.show_albums)
         self.tracks_listbox.bind("<<ListboxSelect>>", self.show_track_info)
         
    
    
-    def enter_artist_name(self):
+    def enter_artist_name(self, *args):
         try: 
             artist_name = self.artist_entry.get()       
 
@@ -193,22 +184,16 @@ class Page1(Page):
 
             selected_album_index = self.albums_listbox.curselection()[0]
             selected_album_name = self.albums_listbox.get(selected_album_index)
-            #print(albums_names)
             selected_album = [album for album in self.albums if album['name'] == selected_album_name][0]
             album_id = selected_album['uri']
             self.album_id = album_id
-            # print(self.album_id)
-            #self.print_track_info(track_info)
-            #self.sp_analyzer.display_tracks(tracks) 
+
             self.insert_tracks_to_listbox() 
             album_stats = self.sp_requester.get_album_info(album_id)
             album_cover_url = album_stats.get('image_url')
             album_name = album_stats.get('name')
             self.album_total_tracks = album_stats.get('total_tracks')
             album_release_date = album_stats.get('release_date')
-
-
-
 
             if self.albums_stats_widget1 is not None:
                 self.albums_stats_widget1.clear_list()
@@ -220,7 +205,6 @@ class Page1(Page):
             self.albums_stats_widget1.add_list_item("Data wydania", album_release_date)
 
             self.show_album_cover_from_url(album_cover_url)  
-            #self.connect_to_db()
      
         except:
             pass
@@ -239,7 +223,7 @@ class Page1(Page):
     def start_saving(self):
         self.button_to_save_to_db.configure(state="disabled")  
         
-        self.progress.grid(row=0, column=6, columnspan=1, padx=10, pady=10)  
+        self.progress.grid(row=0, column=5, columnspan=1, padx=10, pady=10)  
 
 
         self.button_to_save_to_db.configure(text="Trwa zapisywanie...")   
@@ -257,18 +241,16 @@ class Page1(Page):
         self.after(1000)
     
        
-        self.button_to_save_to_db.configure(text="Zapisz do bazy",state="normal")  # Włączenie przycisku po zakończeniu zapisu
+        self.button_to_save_to_db.configure(text="Zapisz do bazy",state="normal")  
         self.PopUpBox.show_custom_error_message(self.current_dir,"Komunikat","Informacje o albumie zapisane","save_icon" )
 
     def creating_db(self):
-        # Tworzenie tabeli tylko raz
         try:
             first_track_uri = self.albums_tracks_info[0]['uri']
         
             first_track_stats = self.sp_requester.get_track_info(first_track_uri)
         
-            db_path = join(self.current_dir, 'scdb.db')
-            self.db.connect(db_path)
+            self.db.connect(self.db_path)
             table_name = "SPotify"
             self.db.create_table(first_track_stats,table_name )
             Thread(target=self.start_saving).start()
@@ -280,28 +262,9 @@ class Page1(Page):
             self.db.create_avarages_table()
 
 
-
-            # table_name = "SPotify"
-            # column_to_retrieve = "duration_mins"
-            # column_name = "NAME"
-            # param_value = "SAUVAGE"
-
-            # query = self.db.retrieve_records(table_name, column_to_retrieve, column_name, param_value)
-            # print(query)
-
-
-
         except AttributeError:
-            #showerror("Błąd", "Wybierz album przed pobraniem danych do bazy")
             self.PopUpBox.show_custom_error_message(self.current_dir,"Błąd","Wybierz album przed pobraniem danych","error_icon" )
 
-    # def track_selection(self, event):
-    #     selected_track_index = self.tracks_listbox.curselection()[0]
-    #     selected_track_name = self.tracks_listbox.get(selected_track_index)
-    #     tracks = self.sp_requester.get_tracks_from_album(self.selected_album['uri'])
-    #     selected_track = [track for track in tracks if track['name'] == selected_track_name][0]
-    #     self.show_track_info(selected_track)
-       
 
     def show_track_info(self, event):
         try: 
@@ -311,7 +274,7 @@ class Page1(Page):
             selected_track = [track for track in tracks if track['name'] == selected_track_name][0]
             track_id = selected_track['uri']
             track_stats = self.sp_requester.get_track_info(track_id)
-            track_duration = f'{track_stats.get("duration mins")} minuty'
+            track_duration = f'{track_stats.get("duration_mins")} minuty'
             track_danceability = track_stats.get('danceability')
             track_energy = track_stats.get('energy')
             track_loudness = track_stats.get('loudness')
@@ -326,8 +289,8 @@ class Page1(Page):
                 self.tracks_stats_widget1.clear_list()
                 self.tracks_stats_widget2.clear_list()
             else:
-                self.tracks_stats_widget1 = ListWithItems(self)
-                self.tracks_stats_widget2 = ListWithItems(self)
+                self.tracks_stats_widget1 = ListWithItems(self.track_stats_frame)
+                self.tracks_stats_widget2 = ListWithItems(self.track_stats_frame)
             self.tracks_stats_widget1.grid(row=8, column=4,padx=(5,5), pady=(10, 10),columnspan=1,sticky="nw")
             self.tracks_stats_widget2.grid(row=8, column=5,padx=(5,5), pady=(10, 10),columnspan=1,sticky="nw")
 
@@ -338,11 +301,10 @@ class Page1(Page):
             self.tracks_stats_widget1.add_list_item("Tempo", track_tempo)
 
             self.tracks_stats_widget2.add_list_item("Mówność", track_speechiness)
-            self.tracks_stats_widget2.add_list_item("Aksutyczność", track_acousticness)
+            self.tracks_stats_widget2.add_list_item("Akustyczność", track_acousticness)
             self.tracks_stats_widget2.add_list_item("Instrumentalność", track_instrumentalness)
             self.tracks_stats_widget2.add_list_item("Żywiołowość", track_liveness)
             self.tracks_stats_widget2.add_list_item("Pozytywne nastawienie", track_valence)
-
 
 
         except:

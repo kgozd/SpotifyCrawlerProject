@@ -4,6 +4,8 @@ from os.path import join
 from api_requests import SpotifyAuthenticator, SpotifyRequester
 from config import client_id, client_secret
 from uuid import uuid4
+from os.path import dirname, join, abspath, isfile
+from os import remove
 
 import threading
 
@@ -14,17 +16,24 @@ import threading
 class Database:
     def __init__(self):
         self.conn = None
-        #self.sp_authenticator = SpotifyAuthenticator(client_id, client_secret)
-        #self.sp_requester = SpotifyRequester(self.sp_authenticator.get_spotify_instance())
-    def connect(self,db_path):
-        self.conn = connect(db_path)
+        current_dir = dirname(abspath(__file__))
+        self.db_path = join(current_dir, 'scdb.db')
+
+    def connect(self, db_path):
+        
+        self.conn = connect(self.db_path)
     
     
     def close(self):
         if self.conn:
             self.conn.commit()
             self.conn.close()
-    
+    def remove_db(self, db_path):
+        print(db_path)
+        if isfile(db_path):
+            remove(db_path)
+     
+
     def create_table(self, record_dict, table_to_create):
         self.table_to_create= table_to_create
         self.record_dict = record_dict
@@ -33,7 +42,6 @@ class Database:
         query = self._generate_create_table_query(record_dict)
         self.conn.execute(query)
         self.conn.commit()
-        print("Utworzono tabelę w bazie danych.")
     
     def add_records(self, record_dict):
         keys = list(record_dict.keys())
@@ -42,7 +50,6 @@ class Database:
         id_value = str(uuid4())
         self.conn.execute(query, [id_value] + values)
         self.conn.commit()
-        #print("Dodano rekord do bazy danych.")
     
     def _process_value(self, value):
         if isinstance(value, (list, dict, tuple, set)):
@@ -72,7 +79,6 @@ class Database:
         self.conn.execute(create_table_query)
 
         self.conn.commit()
-        print("Utworzono tabelę z średnimi kolumnami.")
 
 
 
@@ -84,45 +90,3 @@ class Database:
                 return record[0]
             else:
                 return None
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# def main():
-#     current_dir = getcwd()  # Pobranie bieżącego katalogu
-#     db_path = join(current_dir, 'baza_danych.db')
-    
-#     sp_authenticator = SpotifyAuthenticator(client_id, client_secret)
-#     sp_requester = SpotifyRequester(sp_authenticator.get_spotify_instance())
-    
-#     album_id = "spotify:album:1GabBOxzyUPjkELZE0b3HS"
-#     tracks = sp_requester.get_tracks_from_album(album_id)
-    
-#     first_track_uri = tracks[0]['uri']
-#     first_track_stats = sp_requester.get_track_info(first_track_uri)
-    
-#     db = Database()
-#     db.connect(db_path)
-#     db.create_table(first_track_stats,)
-    
-#     for track in tracks:
-#         track_stats = sp_requester.get_track_info(track['uri'])
-#         db.add_records(track_stats)
-    
-#     db.close()
-
-

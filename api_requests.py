@@ -103,5 +103,6 @@ class SpotifyRequester:
         })
         #print(dumps(dict, indent=4))
         return dict
+        
 
   

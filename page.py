@@ -4,12 +4,11 @@ from config import client_id, client_secret
 
 #additional libraries
 from tkinter import(
-    Frame, ttk, Label,Toplevel,Button
+    Frame, Label,Toplevel,Button
 ) 
 from customtkinter import( 
-    CTkScrollbar, CTkTabview, CTkButton, CTkEntry,
-    set_appearance_mode,set_default_color_theme, CTkScrollableFrame,
-    CTkTextbox, CTkLabel, CTkFont, CTkImage,CTkFrame 
+     CTkButton, set_appearance_mode,
+     set_default_color_theme, CTkLabel,CTkFrame 
 )  
 
 
@@ -28,8 +27,7 @@ class CustomMessage:
         dialog.geometry("340x120")
         path = join(current_dir, 'Pictures\\sc_icon.ico')
         dialog.iconbitmap(path)
-        #current_dir = dirname(abspath(__file__))
-        # Słownik mapujący nazwy ikon na odpowiadające im ścieżki obrazów
+
         image_paths = {
             "error_icon": join(current_dir, 'Pictures\\error_icon.png'),
             "warning_icon": join(current_dir, 'Pictures\\warning_icon.png'),
@@ -37,7 +35,6 @@ class CustomMessage:
             "save_icon": join(current_dir, 'Pictures\\save_icon.png')
         }
 
-        # Sprawdzenie, czy nazwa ikony istnieje w słowniku
         if icon in image_paths:
             image_path = image_paths[icon]
         else:
@@ -68,31 +65,47 @@ class CustomMessage:
                                            text_color="#000000", command=dialog.destroy,  hover_color="#3bac47")
         ok_button.grid(row=1, column=1, pady=(10, 10), padx=(0,20), columnspan=2, sticky="nse")
  
-        dialog.columnconfigure(0, weight=0)
-        dialog.columnconfigure(1, weight=1)
-        dialog.rowconfigure(0, weight=1)
-
         dialog.transient(self.root)
         dialog.grab_set()
+
+        # Wycentrowanie okna dialogowego na ekranie
+        dialog.update_idletasks()
+        screen_width = dialog.winfo_screenwidth()
+        screen_height = dialog.winfo_screenheight()
+        dialog_width = dialog.winfo_width()
+        dialog_height = dialog.winfo_height()
+        x = (screen_width // 2) - (dialog_width // 2)
+        y = (screen_height // 3) - (dialog_height // 2)
+        dialog.geometry(f"+{x}+{y}")
+
+        dialog.update()  # Odświeżenie interfejsu
+
         self.root.wait_window(dialog)
 
 
 
+class Labele:
+    def __init__(self, parent):
+        self.parent = parent
 
+    def create_label(self, text, font_size=20, font_weight="bold", text_color="#f0f0f0",
+                     row=0, column=0, padx=(0, 0), pady=(0, 0), columnspan=1, sticky="", fg_color = "#242424"):
+        label = CTkLabel(self.parent, text=text, font=("Arial", font_size, font_weight), text_color=text_color,fg_color= fg_color)
+        label.grid(row=row, column=column, padx=padx, pady=pady, columnspan=columnspan, sticky=sticky)
+        return label
 
 
 class ListItem(CTkFrame):
     def __init__(self, parent, header, text):
         super().__init__(parent, bg_color='#242424')
+        self.my_labels1 = Labele(self)
 
-        header_label = Label(self, text=header, foreground='white', background='#2b2b2b', font=('Arial', 12, 'bold'))
-        header_label.grid(row=0, column=0, padx=10,pady=10)
 
-        bullet_label = Label(self, text='\u2022', foreground='#4ddf5d', background='#2b2b2b', font=('Arial', 12, 'bold'))
-        bullet_label.grid(row=0, column=1,padx=10,pady=10)
+        header_label = self.my_labels1.create_label(text=header,   row=0, column=0   ,font_size=13   , padx=(5, 10), pady=(10, 11), columnspan=1, sticky="",fg_color = "#2b2b2b")
+        bullet_label = self.my_labels1.create_label(text='\u2022',   row=0, column=1  ,font_size=14,text_color="#4ddf5d"    , padx=(10, 10), pady=(10, 10), columnspan=1, sticky="",fg_color = "#2b2b2b")
+        text_label = self.my_labels1.create_label(text=text,   row=0, column=2  ,font_size=13     , padx=(10, 10), pady=(11, 10), columnspan=1, sticky="",fg_color = "#2b2b2b")
 
-        text_label = Label(self, text=text, foreground='white',font=('Arial', 11,'bold'), background='#2b2b2b')
-        text_label.grid(row=0, column=2,padx=10,pady=10)
+        
 
 
 class ListWithItems(CTkFrame):
@@ -117,49 +130,12 @@ class ListWithItems(CTkFrame):
         self.list_items = []
 
 
-"""
-class Buttons:
-    def __init__(self, parent):
-        self.parent = parent
 
-    def create_button(self, text,command, font_size=18, font_weight="bold", row=0, 
-                      column=3, padx=(20, 0), pady=(15, 5), columnspan=1, height=40, width = "", sticky=""  ):
-        
-        button = CTkButton(self, text=text,font=("Arial", font_size, font_weight), height=height, width=width,fg_color="#4ddf5d",
-                                           text_color="#000000", command=command,  hover_color="#3bac47",)
-        
-        button.grid(row=row, column=column, padx=padx, pady=pady, columnspan=columnspan, sticky=sticky)
-        return button
-"""
-
-
-"""
-class AlbumsListBox:
-    def __init__(self, parent):
-        self.parent = parent
-        self.albums_listbox = None
-        self.scrollbar = None
-
-    def create_listbox(self, font_size=12, width=40, height=15, bg="#2b2b2b", fg="white", cursor="hand2", selectbackground="#106a43", highlightbackground="#4ddf5d", highlightcolor="#4ddf5d", activestyle='none', justify=tk.LEFT, selectmode=tk.SINGLE, relief="flat", borderwidth=3, row=2, column=1, padx=(20, 0), pady=(0, 0), sticky="nsew", rowspan=3):
-        self.albums_listbox = tk.Listbox(self.parent, font=("Arial", font_size), width=width, height=height, bg=bg, fg=fg, cursor=cursor, selectbackground=selectbackground, highlightbackground=highlightbackground, highlightcolor=highlightcolor, activestyle=activestyle, justify=justify, selectmode=selectmode, relief=relief, borderwidth=borderwidth)
-        self.albums_listbox.grid(row=row, column=column, padx=padx, pady=pady, sticky=sticky, rowspan=rowspan)
-        self.albums_listbox.grid_columnconfigure(0, weight=1)
-
-    def create_scrollbar(self, bg="#2b2b2b", width=20):
-        scrollbar_frame = tk.Frame(self.parent)
-        scrollbar_frame.grid(row=2, column=2, padx=(0, 0), pady=(0, 0), sticky="ns", rowspan=4)
-        scrollbar_style = ttk.Style()
-        scrollbar_style.configure("Custom.Vertical.TScrollbar", troughcolor=bg, background="#106a43", gripcount=0, gripmargin=0, gripstyle="n", width=width)
-        scrollbar_albums = ttk.Scrollbar(scrollbar_frame, orient=tk.VERTICAL, command=self.albums_listbox.yview, style="Custom.Vertical.TScrollbar")
-        scrollbar_albums.pack(fill=tk.Y, side=tk.LEFT)
-        self.albums_listbox.configure(yscrollcommand=scrollbar_albums.set)
-        self.scrollbar = scrollbar_albums
-"""
 class Page(Frame):
     def __init__(self, parent, name):
         super().__init__(parent, bg="#242424")
         self.name = name
-        self.sp_authenticator = SpotifyAuthenticator(client_id, client_secret) # Replace client_id and client_secret with your own Spotify API credentials
+        self.sp_authenticator = SpotifyAuthenticator(client_id, client_secret)
         self.sp_requester = SpotifyRequester(self.sp_authenticator.get_spotify_instance())
         self.current_dir = dirname(__file__)
 
@@ -169,12 +145,4 @@ class Page(Frame):
 
 
 
-class Labele:
-    def __init__(self, parent):
-        self.parent = parent
 
-    def create_label(self, text, font_size=20, font_weight="bold", text_color="#f0f0f0",
-                     row=0, column=0, padx=(0, 0), pady=(0, 0), columnspan=1, sticky=""):
-        label = CTkLabel(self.parent, text=text, font=("Arial", font_size, font_weight), text_color=text_color)
-        label.grid(row=row, column=column, padx=padx, pady=pady, columnspan=columnspan, sticky=sticky)
-        return label
