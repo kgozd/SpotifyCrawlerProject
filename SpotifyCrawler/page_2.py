@@ -74,14 +74,14 @@ class Page2(Page):
             query = self.db.retrieve_records("SPotify", "album_name", "available_markets", "brak_wartości")
             self.db.close()
         
-            self.title= self.my_labels.create_label(f"Wykresy dla albumu: {query}",   row=0, column=1, padx=(20, 20), pady=(5, 5), columnspan = 5)
+            self.title= self.my_labels.create_label(f"Wykresy dla albumu:\n {query}",   row=0, column=1, padx=(70, 20), pady=(40, 5), columnspan = 5, sticky="nsew")
 
         except: 
             pass
 
         self.tracks_listbox = Listbox(self, font=("Arial", 12), width=40, height=15, bg="#2b2b2b", fg="white", cursor="hand2", selectbackground="#106a43",highlightbackground="#4ddf5d",
                                       highlightcolor="#4ddf5d", activestyle='none', justify=LEFT, selectmode=SINGLE,relief="flat", borderwidth=3)
-        self.tracks_listbox.grid(row=1, column=0, padx=(20, 0), pady=(0, 0), sticky="nsew")
+        self.tracks_listbox.grid(row=1, column=0, padx=(100, 0), pady=(0, 0), sticky="nsew")
         self.tracks_listbox.grid_columnconfigure(0, weight=1)
 
         scrollbar_frame = Frame(self)
@@ -113,7 +113,7 @@ class Page2(Page):
                                         values=list(self.value_dict.keys()), variable=self.selected_key,
                                         command=self.handle_optionmenu_selection, font=("Arial", 17,'bold'), height=40,fg_color="#4ddf5d",
                                            text_color="#000000" ,  text_color_disabled= "#111111",dropdown_font=("Arial", 14,'bold'),dropdown_text_color="white",button_color="#4ddf5d",button_hover_color="#3bac47",dropdown_fg_color="#2b2b2b")
-        self.optionmenu.grid(row=0, column=0, padx=20, pady=(20, 10))
+        self.optionmenu.grid(row=0, column=0, padx=(100,20), pady=(70, 30))
 
         canvas = FigureCanvasTkAgg(self.plot1.fig, master=self)
         canvas.get_tk_widget().grid(row=1, column=3, padx=10, pady=10)
@@ -173,16 +173,17 @@ class Page2(Page):
                 self.title.destroy()
             if float(query_1) < float(query_2):
                 
-                self.title= self.my_labels.create_label(f" {self.selected_key.get()} w tym utworze jest o {percent}% mniejsza niż średnia dla albumu",
+                self.title= self.my_labels.create_label(f" {self.selected_key.get()} w tym utworze jest o {percent}%\n mniejsza niż średnia dla albumu",
                                                         row=5, column=2, padx=(20, 20), pady=(5, 5), columnspan = 5) 
             else:
-                self.title= self.my_labels.create_label(f"{self.selected_key.get()} w tym utworze jest o {percent}% większa niż średnia dla albumu",
+                self.title= self.my_labels.create_label(f"{self.selected_key.get()} w tym utworze jest o {percent}%\nwiększa niż średnia dla albumu",
                                                                                      row=5, column=2, padx=(20, 20), pady=(5, 5), columnspan = 5)                                                                                                                                             
 
 
 
             self.plot1.rysuj(
-            f"{self.selected_key.get()} dla utworu {self.selected_track_name}",
+            
+            f"{self.selected_key.get()}dla utworu:\n{self.selected_track_name}",
             "",
             "",
             ["Średnia albumu", "Wybrany utwór"],
@@ -202,7 +203,7 @@ class Page2(Page):
             if len(utwor)> 15:
                 three_dots = "..."
 
-            self.plot1.rysuj(f"{key} dla utworu {utwor[0:15]}{three_dots}", "", "",[ "Średnia albumu","Wybrany utwór"], [round(float(query_2),2),round(float(query_1),2)])
+            self.plot1.rysuj(f"{key} dla utworu:\n{utwor[0:25]}{three_dots}", "", "",[ "Średnia albumu","Wybrany utwór"], [round(float(query_2),2),round(float(query_1),2)])
             
         except UnboundLocalError:
             pass

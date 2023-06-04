@@ -46,14 +46,14 @@ class Page1(Page):
         
     def create_widgets(self):            
         self.listboxes_frame = CTkFrame(self, bg_color='#242424',fg_color="#242424", corner_radius=5, height = 20)
-        self.listboxes_frame.grid(row=0, column=1, rowspan=8, padx=(20, 20), pady=(10,0))
+        self.listboxes_frame.grid(row=0, column=1, rowspan=8, padx=(100, 20), pady=(10,0),sticky="wsne")
 
         self.artist_entry = CTkEntry(self.listboxes_frame,font=("Arial", 18), height=40,  placeholder_text="Wpisz Nazwę Artysty", fg_color="#2b2b2b", placeholder_text_color="#f0f0f0", text_color="white")
         self.artist_entry.grid(row=0, column=1,  padx=(25, 0), pady=(15, 5),  sticky="nsew")
         self.artist_entry.grid_columnconfigure(0, weight=1)  
 
         self.buttons_frame = CTkFrame(self, bg_color='#242424',fg_color="#242424", corner_radius=5, height = 20)
-        self.buttons_frame.grid(row=0, column=3, columnspan=2, padx=(20, 20))
+        self.buttons_frame.grid(row=0, column=3, columnspan=2, padx=(70, 20), pady=(15,0), sticky="wsne")
 
 
         self.button_to_request = CTkButton(self.buttons_frame, text="Pobierz dane ",font=("Arial", 18,'bold'), height=40, width =20 ,fg_color="#4ddf5d",
@@ -88,7 +88,7 @@ class Page1(Page):
 
 
         self.albums_listbox_label = CTkLabel(self.listboxes_frame,text= "Albumy", font=("Arial", 20, 'bold'),  text_color="#f0f0f0"     )
-        self.albums_listbox_label.grid(row=1, column=1, padx=(0, 0), pady=(0, 0), columnspan=1,sticky="nsew")        
+        self.albums_listbox_label.grid(row=1, column=1, padx=(0, 0), pady=(5, 5), columnspan=1,sticky="nsew")        
         
 
         
@@ -106,7 +106,7 @@ class Page1(Page):
         self.albums_listbox.configure(yscrollcommand=scrollbar_albums.set)
 
         self.tracks_listbox_label = CTkLabel(self.listboxes_frame,text= "Utwory", font=("Arial", 20, 'bold'),  text_color="#f0f0f0"     )
-        self.tracks_listbox_label.grid(row=4, column=1, padx=(5, 5), pady=(0, 0), columnspan=1,sticky="nsew")  
+        self.tracks_listbox_label.grid(row=4, column=1, padx=(5, 5), pady=(10, 5), columnspan=1,sticky="nsew")  
         
 
         self.tracks_listbox = Listbox(self.listboxes_frame, font=("Arial", 13), width=40, height=20, bg="#2b2b2b", fg="white", cursor="hand2", selectbackground="#106a43",highlightbackground="#4ddf5d",
@@ -156,7 +156,7 @@ class Page1(Page):
                 self.artist_stats_widget1.clear_list()
             else:
                 self.artist_stats_widget1 = ListWithItems(self)
-                self.artist_stats_widget1.grid(row=2, column=4, padx=(5, 5), pady=(10, 10), columnspan=1, sticky="nw")
+                self.artist_stats_widget1.grid(row=2, column=4, padx=(5, 5), pady=(5, 5), columnspan=1, sticky="nw")
             self.artist_stats_widget1.clear_list()
             self.artist_stats_widget1.add_list_item("Nazwa Artysty", artist_name)
             self.artist_stats_widget1.add_list_item("Obserwujący", artist_followers)
@@ -200,7 +200,7 @@ class Page1(Page):
                 self.albums_stats_widget1.clear_list()
             else:
                 self.albums_stats_widget1 = ListWithItems(self)
-                self.albums_stats_widget1.grid(row=4, column=4,padx=(5,5), pady=(10, 10),columnspan=1,sticky="nw")
+                self.albums_stats_widget1.grid(row=4, column=4,padx=(5,5), pady=(5, 5),columnspan=1,sticky="nw")
             self.albums_stats_widget1.add_list_item("Nazwa Albumu", album_name)
             self.albums_stats_widget1.add_list_item("Liczba Utworów", self.album_total_tracks)
             self.albums_stats_widget1.add_list_item("Data wydania", album_release_date)
@@ -292,7 +292,7 @@ class Page1(Page):
             else:
                 self.tracks_stats_widget1 = ListWithItems(self.track_stats_frame)
                 self.tracks_stats_widget2 = ListWithItems(self.track_stats_frame)
-            self.tracks_stats_widget1.grid(row=8, column=4,padx=(5,5), pady=(10, 10),columnspan=1,sticky="nw")
+            self.tracks_stats_widget1.grid(row=8, column=4,padx=(20,15), pady=(10, 10),columnspan=1,sticky="nw")
             self.tracks_stats_widget2.grid(row=8, column=5,padx=(5,5), pady=(10, 10),columnspan=1,sticky="nw")
 
             self.tracks_stats_widget1.add_list_item("Czas trwania", track_duration)

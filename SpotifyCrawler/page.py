@@ -101,9 +101,9 @@ class ListItem(CTkFrame):
         self.my_labels1 = Labele(self)
 
 
-        header_label = self.my_labels1.create_label(text=header,   row=0, column=0   ,font_size=13   , padx=(5, 10), pady=(10, 11), columnspan=1, sticky="",fg_color = "#2b2b2b")
-        bullet_label = self.my_labels1.create_label(text='\u2022',   row=0, column=1  ,font_size=14,text_color="#4ddf5d"    , padx=(10, 10), pady=(10, 10), columnspan=1, sticky="",fg_color = "#2b2b2b")
-        text_label = self.my_labels1.create_label(text=text,   row=0, column=2  ,font_size=13     , padx=(10, 10), pady=(11, 10), columnspan=1, sticky="",fg_color = "#2b2b2b")
+        self.my_labels1.create_label(text=header,   row=0, column=0   ,font_size=13   , padx=(5, 10), pady=(10, 11), columnspan=1, sticky="",fg_color = "#2b2b2b")
+        self.my_labels1.create_label(text='\u2022',   row=0, column=1  ,font_size=14,text_color="#4ddf5d"    , padx=(10, 10), pady=(10, 10), columnspan=1, sticky="",fg_color = "#2b2b2b")
+        self.my_labels1.create_label(text=text,   row=0, column=2  ,font_size=13     , padx=(10, 10), pady=(11, 10), columnspan=1, sticky="",fg_color = "#2b2b2b")
 
         
 
