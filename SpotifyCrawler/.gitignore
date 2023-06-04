@@ -3,10 +3,12 @@ run.spec
 temp_music.mp3
 projekt_POC.code-workspace
 schemat_plików_projekt_POC.vsdx
-sqllitedb/baza_danych.db
-test_sqllite.py
-baza_danych.db
 scdb.db
+SC_schemat_plikow.vsdx
+projekt_sc.code-workspace
+Spotify_Crawler/
+config.py
+.cache
 #Pictures/sc_icon.ico
 #Pictures/sc_icon.png
 
