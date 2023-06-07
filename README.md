@@ -6,6 +6,10 @@ To run application after downloading project from repository you should:
 1) create config.py file which consists api keys(struture of the file below): 
 
     #APi_keys
+    
+    
+    
+    
     client_id="<spotify_client_id>"
     client_secret= "<spotify_client_secret>"
 
