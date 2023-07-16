@@ -1,13 +1,8 @@
 from sqlite3 import connect
-from os import getcwd
 from os.path import join
-from api_requests import SpotifyAuthenticator, SpotifyRequester
-from config import client_id, client_secret
 from uuid import uuid4
 from os.path import dirname, join, abspath, isfile
-from os import remove
 
-import threading
 
 
 
