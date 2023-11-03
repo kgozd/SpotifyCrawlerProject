@@ -1,9 +1,7 @@
 
 # SpotifyCrawlerProject
 
-This Python project project is an appliction which conencts with Spotify API and browse artists, albums and songs statitstics. For best expierience I recommend to use Python 3.11 *(or higher) version.
-## Requirements
-
+This Python project is an application that connects to the Spotify API to browse artists, albums, and song statistics. Additionally, it allows you to compare songs from a specific album based on attributes like danceability, duration, and more. You can also export the comparison results as charts in PNG format
 To run application after downloading project from repository you should:
 
 - Install Python 3.11 or higher
